@@ -7,11 +7,18 @@
 
 #include <iostream>
 #include "raylib.h"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
+
+// raygui embedded style
+#include "../include/bluish.h"
+
 #include "Ball.h"
 #include "MovingEntity.h"
 #include "PlayingBar.h"
 #include "Level.h"
 #include "EasyBreakout.h"
+#include "StorageValue.h"
 #include "Player.h"
 
 //------------------------------------------------------------------------------------
@@ -34,10 +41,10 @@ int main(void)
 
     // Loading game objects
     //--------------------------------------------------------------------------------------
-    Level * level = new Level(1, 15);
+    Level * level = new Level(RAYWHITE, 1, 18);
     Player * player = new Player(level); 
     PlayingBar * playingBar = new PlayingBar(MAROON);    
-    Ball * ball = new Ball(MAROON, BALL_RADIUS, {(float)SCREEN_WIDTH/2, playingBar->get_position().y - BALL_RADIUS}, level->get_ball_speed());
+    Ball * ball = new Ball(MAROON, playingBar->get_position().y, level->get_ball_speed());
 
     // Initializing game sound
     //--------------------------------------------------------------------------------------
@@ -51,6 +58,9 @@ int main(void)
     SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
     PlayMusicStream(background_sound);
 
+    // Load bluish style
+    GuiLoadStyleBluish();
+
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
@@ -61,6 +71,8 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
+
+        
 
         // Moving playing bat
         playingBar->Move();
@@ -99,7 +111,11 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+            ClearBackground(level->get_background_color());
+                        // ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+
+            // GuiLabel((Rectangle){ 10, 20, 60, 24 }, "Style:");
+
 
             level->Draw();
             playingBar->Draw();            
@@ -132,8 +148,6 @@ int main(void)
 
     return 0;
 }
-
-
 
 // Save integer value to storage file (to defined position)
 // NOTE: Storage positions is directly related to file memory layout (4 bytes each integer)

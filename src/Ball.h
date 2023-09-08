@@ -11,19 +11,26 @@
 #include "raylib.h"
 #include "MovingEntity.h"
 #include "Circle.h"
-#include "Level.h"
+#include "Level.h" 
 
 class Ball final : public MovingEntity, public Circle {
+
 private:
 	Color color;
-	bool  held = true;	// Ball doesn't go out if playing bar is holding it 
-	bool  enabled = true; // Enabled to crush blocks, preventing from falling other blocks nearby accidently
+	bool  held = true;										// Ball doesn't go out if playing bar is holding it 
+	bool  enabled = true; 									// Enabled to crush blocks, preventing from falling other blocks nearby accidently
 
 	// Angle of bouncing ball depends on the speed on x-axis, so getting its random speed	
 	const float RandomSpeedOnX(const float& speed_x, const int& level_num) const;  
 
+	constexpr static float kRadius = 10.0f;                // Ball radius
+
 public:
-	Ball (const Color& color, const int& radius, const Vector2& position, const Vector2& speed);
+	constexpr static float kInitalSpeedOnX = 4.0f;           // Initial ball speed on x-axis 
+	constexpr static float kInitalSpeedOnY = -5.0f;          // Initial ball speed on y-axis 
+	constexpr static float kSpeedIncrementRate = 1/5;    // Ball speed increment due to game level
+
+	Ball (const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius = kRadius);
 	
 	void Move() override;
 	void Draw() override;
@@ -41,5 +48,10 @@ public:
 	void set_released() { held = false; }
 	void set_disabled() { enabled = false; }
 };
+
+// Getting random rate of speed on x-axis
+inline float RandomRateOfSpeedOnX() {
+    return (GetRandomValue(5, 20) / 10);
+}
 
 #endif // BALL_H_

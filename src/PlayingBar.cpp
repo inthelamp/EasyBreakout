@@ -10,7 +10,7 @@
 #include "PlayingBar.h"
 
 PlayingBar :: PlayingBar(const Color& color)
-					: MovingEntity(kPlayingBarSpeed), RoundedRect({(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PLAYING_BAR_POS_Y }, 
+					: MovingEntity(kPlayingBarSpeed), RoundedRect({(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PlayingBarPosY(SCREEN_HEIGHT) }, 
 																	kPlayingBarWidth, kPlayingBarHeight, kPlayingBarRoundness, kPlayingBarSegments) {
 	this->color = color;
 }

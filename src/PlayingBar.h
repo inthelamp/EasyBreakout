@@ -28,4 +28,9 @@ public:
 	void Draw() override;
 };
 
+// Getting intial y-axis position of playing bar 
+inline float PlayingBarPosY(const float& screen_height) {
+    return screen_height - 50;
+}
+
 #endif // PLAYINGBAR_H_ 

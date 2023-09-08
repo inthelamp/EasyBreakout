@@ -7,14 +7,17 @@
 
 #include <new>
 #include "raylib.h"
-#include "EasyBreakout.h"
+#include "EasyBreakout.h" 
+#include "Ball.h"
 #include "Block.h"
 #include "Level.h"
 
-Level :: Level(const int& level_num, const int& number_of_blocks) 
-            : level_num(level_num), number_of_blocks(number_of_blocks), 
-              ball_speed({(INIT_BALL_SPEED_X + level_num * BALL_SPEED_INCREMENT_RATE) * BALL_RANDOM_SPEED_RATE_ON_X, 
-                           INIT_BALL_SPEED_Y + level_num * BALL_SPEED_INCREMENT_RATE}) {
+#define MAX_NUM_BLOCKS_IN_ROW   ((int)(SCREEN_WIDTH / (Block::kBlockWidth + Block::kBlockColumnOffset)))
+
+Level :: Level(const Color& background_color, const int& level_num, const int& number_of_blocks) 
+            : background_color(background_color), level_num(level_num), number_of_blocks(number_of_blocks), 
+              ball_speed({(Ball::kInitalSpeedOnX + level_num * Ball::kSpeedIncrementRate) * RandomRateOfSpeedOnX(), 
+                           Ball::kInitalSpeedOnY + level_num * Ball::kSpeedIncrementRate}) {
 
         // Setting starting position    
         float pos_x;                        
@@ -23,7 +26,7 @@ Level :: Level(const int& level_num, const int& number_of_blocks)
         } else {            
             float pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
         }
-        this->set_position({pos_x, START_POS_Y});        
+        this->set_position({pos_x, kStartPosY});        
 
         // Allocating blocks
         blocks = new (std::nothrow) Block[number_of_blocks];
@@ -33,8 +36,8 @@ Level :: Level(const int& level_num, const int& number_of_blocks)
         }
 }
 
-Level :: Level(const int& level_num, const int& number_of_blocks, const Vector2& ball_speed) 
-            : level_num(level_num), number_of_blocks(number_of_blocks), ball_speed(ball_speed) {
+Level :: Level(const Color& background_color, const int& level_num, const int& number_of_blocks, const Vector2& ball_speed) 
+            : background_color(background_color), level_num(level_num), number_of_blocks(number_of_blocks), ball_speed(ball_speed) {
 
         // Setting starting position  
         float pos_x;                        
@@ -43,7 +46,7 @@ Level :: Level(const int& level_num, const int& number_of_blocks, const Vector2&
         } else {            
             float pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
         }
-        this->set_position({pos_x, START_POS_Y});        
+        this->set_position({pos_x, kStartPosY});        
 
         // Allocating blocks
         blocks = new (std::nothrow) Block[number_of_blocks];
@@ -106,3 +109,5 @@ void Level :: Fall() {
         if (blocks[i].is_falling() && !blocks[i].is_disabled()) blocks[i].Move();        
     }
 }
+
+#undef MAX_NUM_BLOCKS_IN_ROW

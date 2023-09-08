@@ -9,31 +9,32 @@
 #define LEVEL_H_
 
 #include "raylib.h"
-#include "EasyBreakout.h"
 #include "GraphicsEntity.h"
 #include "Block.h"
 
-#define START_POS_Y             50.0f
-#define MAX_NUM_BLOCKS_IN_ROW   ((int)(SCREEN_WIDTH / (Block::kBlockWidth + Block::kBlockColumnOffset)))
-
 class Level : public GraphicsEntity {
+    
 private:
 	constexpr static int kMaxLevelNumber = 20;
+    constexpr static float kStartPosY = 50.0f;
 
     Block * blocks;
     const int level_num;                        // Representing its level
+    const Color background_color;               // Background color of game    
     const int number_of_blocks;                 // The number of blocks to hit in the level
     const Vector2 ball_speed;                   // Ball speed of level
 
 public:    
-    Level(const int& level_num, const int& number_of_blocks);
-    Level(const int& level_num, const int& number_of_blocks, const Vector2& ball_speed);
+    Level(const Color& background_color, const int& level_num, const int& number_of_blocks);
+    Level(const Color& background_color, const int& level_num, const int& number_of_blocks, const Vector2& ball_speed);
     virtual ~Level() {
         delete[] blocks;
     }
   
     Block * get_blocks() { return blocks; }
 	const int& get_level_num() const { return level_num; }
+    const Color& get_background_color() const & { return background_color; }
+	Color get_background_color() && { return std::move(background_color); }    
     const int& get_number_of_blocks() const { return number_of_blocks; }      
     const Vector2& get_ball_speed() const & { return ball_speed; }
 	Vector2 get_ball_speed() && { return std::move(ball_speed); }

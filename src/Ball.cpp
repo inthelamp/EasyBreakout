@@ -9,11 +9,10 @@
 #include "Ball.h"
 
 // Initializing ball 
-Ball :: Ball (const Color& color, const int& radius, const Vector2& position, const Vector2& speed)
-			: MovingEntity(speed), Circle(position, radius) {
+Ball :: Ball (const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius)
+			: MovingEntity(speed), Circle({(float)SCREEN_WIDTH/2, playing_bar_position_y - radius}, radius) {
 		this->color = color;
 }
-
 
 bool Ball :: IsHeld() const {
 	return held;
@@ -31,13 +30,13 @@ void Ball :: Move() {
     if (position.x >= (GetScreenWidth() - this->get_radius()) || (position.x <= this->get_radius())) {
 		auto speed = this->get_speed();
 		this->set_speed( { speed.x * -1.0f, speed.y } );
-		if (!this->enabled) this->enabled = true;       		// It is enabled when it hits wall
+		if (!this->enabled) this->enabled = true;       		// It is enabled when it hits walls
 	}
 
     if (position.y >= (GetScreenHeight() - this->get_radius()) || (position.y <= this->get_radius())) {
 		auto speed = this->get_speed();
 		this->set_speed( { speed.x, speed.y * -1.0f } );
-		if (!this->enabled) this->enabled = true;				// It is enabled when it hits ceiling
+		if (!this->enabled) this->enabled = true;				// It is enabled when it hits ceiling or floor
 	}
 
 	this->set_position(position);	
@@ -93,10 +92,8 @@ void Ball :: Collide(const Rectangle& rec, const int& level_num) {
 const float Ball :: RandomSpeedOnX(const float& speed_x, const int& level_num) const {
 	int direction = 0;
 
-	if (abs(speed_x) > (INIT_BALL_SPEED_X + level_num * BALL_SPEED_INCREMENT_RATE) * 2) direction = -1;
-	else if(abs(speed_x) < INIT_BALL_SPEED_X + level_num * BALL_SPEED_INCREMENT_RATE) direction = 1; 
+	if (abs(speed_x) > (kInitalSpeedOnX + level_num * kSpeedIncrementRate) * 2) direction = -1;
+	else if(abs(speed_x) < kInitalSpeedOnX + level_num * kSpeedIncrementRate) direction = 1; 
 
-	float random = BALL_RANDOM_SPEED_RATE_ON_X;
-
-	return speed_x + (direction * random);
+	return speed_x + (direction * RandomRateOfSpeedOnX());
 }

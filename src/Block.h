@@ -21,6 +21,7 @@ private:
 	bool disabled = false; 
 	bool falling = false;
 
+	constexpr static float kBlockFallingSpeed = 5.0f;         // Block falling speed on y-axis
 	constexpr static float kBlockRoundness = 0.2f;
 	constexpr static float kBlockSegments = 0.0f;
 
@@ -46,5 +47,11 @@ public:
 	void Move() override;
     void Draw() override;
 };
+
+// Getting complementary color
+inline Color ComplementaryColor (const Color& color)
+{
+    return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
+}
 
 #endif // BLOCK_H 

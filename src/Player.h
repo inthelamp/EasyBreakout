@@ -12,8 +12,9 @@
 
 class Player {
 private:
-    const Level * level;                 // Game level
-    unsigned int score = 0;              // Game score    
+    const Level * level;                            // Game level
+    unsigned int score = 0;                         // Game score   
+    const enum status_t { play, stop, end } status = stop;  
 
 public:     
     Player(const Level * level);
