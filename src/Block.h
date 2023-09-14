@@ -13,6 +13,22 @@
 #include "MovingEntity.h"
 #include "RoundedRect.h"
 
+// Getting random color
+inline Color RandomColor() {
+	return (Color){ (unsigned char) GetRandomValue(0, 254), (unsigned char) GetRandomValue(0, 254), (unsigned char) GetRandomValue(0, 254), 0xff };
+}
+
+// Getting random points
+inline int RandomPoints() {
+	return GetRandomValue(50, 200);
+}
+
+// Getting complementary color
+inline Color ComplementaryColor (const Color& color)
+{
+    return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
+}
+
 class Block : public MovingEntity, public RoundedRect {
 private:
 	const Color color;
@@ -20,12 +36,13 @@ private:
 
 	bool disabled = false; 
 	bool falling = false;
-
+	
 	constexpr static float kBlockFallingSpeed = 5.0f;         // Block falling speed on y-axis
 	constexpr static float kBlockRoundness = 0.2f;
 	constexpr static float kBlockSegments = 0.0f;
 
 public:
+	static int num_of_disabled_blocks;                        // Number of disabled blocks
 	constexpr static float kBlockWidth = 100.0f;
 	constexpr static float kBlockHeight = 30.0f;
 	constexpr static float kBlockRowOffset = 1.0f;
@@ -43,15 +60,9 @@ public:
 	const bool is_falling() const { return falling; }
 	void set_disabled() { disabled = true; }
 	void set_falling() { falling = true; }
-	
+
 	void Move() override;
     void Draw() override;
 };
-
-// Getting complementary color
-inline Color ComplementaryColor (const Color& color)
-{
-    return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
-}
 
 #endif // BLOCK_H 

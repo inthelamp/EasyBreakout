@@ -19,6 +19,7 @@
 #include "Level.h"
 #include "EasyBreakout.h"
 #include "StorageValue.h"
+#include "Block.h"
 #include "Player.h"
 
 //------------------------------------------------------------------------------------
@@ -41,88 +42,176 @@ int main(void)
 
     // Loading game objects
     //--------------------------------------------------------------------------------------
-    Level * level = new Level(RAYWHITE, 1, 18);
+    Level * level = new Level(RAYWHITE, 1, 7);
     Player * player = new Player(level); 
     PlayingBar * playingBar = new PlayingBar(MAROON);    
     Ball * ball = new Ball(MAROON, playingBar->get_position().y, level->get_ball_speed());
 
     // Initializing game sound
     //--------------------------------------------------------------------------------------
-    InitAudioDevice();      // Initialize audio device
+    InitAudioDevice();                                                          // Initialize audio device
 
-    Sound hit_block_sound = LoadSound("../assets/audio/shoot.wav");             // Loading hitting block audio file
-    Sound hit_bar_sound = LoadSound("../assets/audio/hit.wav");                 // Loading hitting bar audio file
+    Sound hit_block_sound = LoadSound("../assets/audio/shoot.wav");             // Load hitting block audio file
+    Sound hit_bar_sound = LoadSound("../assets/audio/hit.wav");                 // Load hitting bar audio file
     SetSoundVolume(hit_bar_sound, 0.5f);    
-    Music background_sound = LoadMusicStream("../assets/audio/background.wav"); // Loding background sound audio file
-    background_sound.looping = true;
-    SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
-    PlayMusicStream(background_sound);
+    // Music background_sound = LoadMusicStream("../assets/audio/background.wav"); // Load background sound audio file
+    // background_sound.looping = true;
+    // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
+    // PlayMusicStream(background_sound);
 
     // Load bluish style
     GuiLoadStyleBluish();
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    bool exitWindow = false;
+
+    SetTargetFPS(60);                               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!exitWindow)                             // Detect window close button or ESC key
     {
         //----------------------------------------------------------------------------------        
         // Update
         //----------------------------------------------------------------------------------
-        UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
+        // UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
 
-        
+        if (player->get_status() == intro) {
 
-        // Moving playing bat
-        playingBar->Move();
+        } else if (player->get_status() == play) {
+            if (IsKeyDown(KEY_ESCAPE)) player->set_status(intro);
 
-        // Bouncing ball logic
-        if (ball->IsHeld() && IsKeyDown(KEY_SPACE)) ball->set_released();
-        if (!ball->IsHeld()) {
-            ball->Move();    
-        } else {
-            ball->set_position_x(playingBar->get_position_x() + playingBar->get_rec().width / 2); // Moving along with the playing bar
-        }   
+            // Moving playing bat
+            playingBar->Move();
 
-        // When the ball hits the playing bar
-        if (ball->IsCollided(playingBar->get_rec()) && !ball->IsHeld()) {
-            PlaySound(hit_bar_sound);      
-            ball->Collide(playingBar->get_rec(), level->get_level_num());
+            // Bouncing ball logic
+            if (ball->IsHeld() && IsKeyDown(KEY_SPACE)) ball->set_held(false);
+            if (!ball->IsHeld()) {
+                ball->Move();    
+            } else {
+                ball->set_position_x(playingBar->get_position_x() + playingBar->get_rec().width / 2); // Move along with the playing bar
+            }   
+
+            // When the ball hits the playing bar
+            if (ball->IsCollided(playingBar->get_rec()) && !ball->IsHeld()) {
+                PlaySound(hit_bar_sound);      
+                ball->Collide(playingBar->get_rec(), level->get_level_num());
+            }
+
+            // When the ball hits blocks 
+            Block * blocks = std::move(level->get_blocks());
+            if ( const int block_num = ball->IsCollided(blocks, level->get_number_of_blocks()) != -1) {
+                if (ball->get_risk_rate() > 2) {
+                    player->set_status(out);
+                } else {
+                    PlaySound(hit_block_sound);
+                    ball->Collide(blocks[block_num].get_rec(), ball->get_speed());
+                    player->AddScore(blocks[block_num].get_point());    
+                }                                            
+            }
+
+            // Falling blocks after collision
+            //----------------------------------------------------------------------------------
+            level->Fall();
+
+            if (level->is_level_finished()) player->set_status(level_up);       // After completing the level, player goes to the next level   
+        } else if (player->get_status() == out) {                               // Failed, try the same level again
+            int level_num = level->get_level_num();
+            int num_of_blocks = level->get_number_of_blocks();      
+
+            // Delete current level
+            delete level;
+
+            // Load new level data
+            Block::num_of_disabled_blocks = 0;
+            level = new Level(RAYWHITE, level_num, num_of_blocks);
+
+            // Initialize game objects
+            player->set_level(level);
+            player->set_score(0);
+
+            playingBar->set_default_position();
+
+            ball->set_default_position(playingBar->get_position().y);
+            ball->set_speed(level->get_ball_speed());
+            ball->set_held(true);
+            ball->set_enabled(true);
+            ball->set_risk_rate(0);
+            
+            WaitTime(2);                                                        // Wait 2 seconds
+
+            player->set_status(play);                 
+        } else if (player->get_status() == level_up) {
+            int level_num = level->get_level_num();
+            int num_of_blocks = level->get_number_of_blocks();      
+
+            // Delete current level
+            delete level;
+
+            // Load new level data
+            Block::num_of_disabled_blocks = 0;
+            level = new Level(RAYWHITE, ++level_num, num_of_blocks + 5);
+
+            // Initialize game objects
+            player->set_level(level);
+            playingBar->set_default_position();
+
+            ball->set_default_position(playingBar->get_position().y);
+            ball->set_speed(level->get_ball_speed());
+            ball->set_held(true);
+            ball->set_enabled(true);
+            ball->set_risk_rate(0);            
+            
+            WaitTime(2);                                                        // Wait 2 seconds
+
+            player->set_status(play);      
+        } else if (player->get_status() == end) {
+            exitWindow = WindowShouldClose();
         }
-
-        // When the ball hits blocks 
-        Block * blocks = std::move(level->get_blocks());
-        if ( const int block_num = ball->IsCollided(blocks, level->get_number_of_blocks()) != -1) {
-            PlaySound(hit_block_sound);
-            ball->Collide(blocks[block_num].get_rec(), ball->get_speed());
-            player->AddScore(blocks[block_num].get_point());
-        }
-
-        // Falling blocks after collision
-        //----------------------------------------------------------------------------------
-        level->Fall();
-
-        // Update user information
-        const std::string player_score = "Score : " + std::to_string(player->get_score());
-
         //----------------------------------------------------------------------------------
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(level->get_background_color());
-                        // ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            // Introduction of game
+            if (player->get_status() == intro) {
+                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+                DrawText("Easy Breakout", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100 , 40, GREEN);
+                if (GuiButton((Rectangle){ SCREEN_WIDTH/2 - 115, SCREEN_HEIGHT/2, 125, 30 }, GuiIconText(ICON_PLAYER_PLAY, "Play"))) {
+                    player->set_status(play);                    
+                }    
+                if (GuiButton((Rectangle){ SCREEN_WIDTH/2 + 10, SCREEN_HEIGHT/2, 125, 30 }, GuiIconText(ICON_PLAYER_STOP, "End"))) {
+                    player->set_status(end);
+                }                            
+            // Playing game               
+            } else  if (player->get_status() == play) {
+                ClearBackground(level->get_background_color());
 
-            // GuiLabel((Rectangle){ 10, 20, 60, 24 }, "Style:");
+                level->Draw();
+                playingBar->Draw();            
+                ball->Draw();
 
+                // Presenting player current level
+                const std::string player_level = "Level : " + std::to_string(level->get_level_num());                 
+                DrawText(player_level.c_str(), 10, 10, 20, DARKGRAY);                  
 
-            level->Draw();
-            playingBar->Draw();            
-            ball->Draw();
+                // Presenting offensive rate
+                const std::string offensive_rate = "Risk rate : " + std::to_string(ball->get_risk_rate());            
+                DrawText(offensive_rate.c_str(), SCREEN_WIDTH / 2 - 50, 10, 20, DARKGRAY);               
+    
+                // Presenting player score
+                const std::string player_score = "Score : " + std::to_string(player->get_score());            
+                DrawText(player_score.c_str(), SCREEN_WIDTH - 140, 10, 20, DARKGRAY);   
 
-            // Presenting player score
-            DrawText(player_score.c_str(), 10, 10, 20, DARKGRAY);
+            } else if (player->get_status() == out) {
+                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));                
+                DrawText("Try again!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, RED);
+            } else if (player->get_status() == level_up) {
+                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));                
+                DrawText("Level up!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, BLACK);
+            } else if (player->get_status() == end) {
+                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR))); 
+                DrawText("Goodbye!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, GRAY);
+            }
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -131,9 +220,9 @@ int main(void)
     //----------------------------------------------------------------------------------
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadSound(hit_block_sound);     // Unload sound data
-    UnloadSound(hit_bar_sound);     // Unload sound data    
-    UnloadMusicStream(background_sound);          // Unload music stream buffers from RAM
+    UnloadSound(hit_block_sound);                    // Unload sound data
+    UnloadSound(hit_bar_sound);                      // Unload sound data    
+    // UnloadMusicStream(background_sound);          // Unload music stream buffers from RAM
 
     // Deleting dynamic storages
     //-------------------------------------------------------------------------------------
@@ -141,9 +230,9 @@ int main(void)
     delete playingBar;
     delete level;
 
-    CloseAudioDevice();     // Close audio device
+    CloseAudioDevice();                             // Close audio device
 
-    CloseWindow();        // Close window and OpenGL context
+    CloseWindow();                                  // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
     return 0;

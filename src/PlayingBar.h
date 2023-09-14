@@ -12,6 +12,11 @@
 #include "MovingEntity.h"
 #include "RoundedRect.h"
 
+// Getting intial y-axis position of playing bar 
+inline float PlayingBarPosY(const float& screen_height) {
+    return screen_height - 50;
+}
+
 class PlayingBar final : public MovingEntity, public RoundedRect {
 private:
 	Color color;
@@ -24,13 +29,9 @@ private:
 	
 public:
 	PlayingBar(const Color& color);
+	void set_default_position() { set_position((Vector2){(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PlayingBarPosY(SCREEN_HEIGHT)}); }
 	void Move() override;
 	void Draw() override;
 };
-
-// Getting intial y-axis position of playing bar 
-inline float PlayingBarPosY(const float& screen_height) {
-    return screen_height - 50;
-}
 
 #endif // PLAYINGBAR_H_ 

@@ -7,26 +7,23 @@
 
 #include <new>
 #include "raylib.h"
-#include "EasyBreakout.h" 
 #include "Ball.h"
 #include "Block.h"
 #include "Level.h"
 
-#define MAX_NUM_BLOCKS_IN_ROW   ((int)(SCREEN_WIDTH / (Block::kBlockWidth + Block::kBlockColumnOffset)))
-
 Level :: Level(const Color& background_color, const int& level_num, const int& number_of_blocks) 
             : background_color(background_color), level_num(level_num), number_of_blocks(number_of_blocks), 
-              ball_speed({(Ball::kInitalSpeedOnX + level_num * Ball::kSpeedIncrementRate) * RandomRateOfSpeedOnX(), 
-                           Ball::kInitalSpeedOnY + level_num * Ball::kSpeedIncrementRate}) {
+              ball_speed((Vector2){Ball::kInitalSpeedOnX + RandomRateOfSpeedOnX() + level_num * Ball::kSpeedIncrementRate, 
+                           Ball::kInitalSpeedOnY - level_num * Ball::kSpeedIncrementRate}) {
 
         // Setting starting position    
         float pos_x;                        
-        if (number_of_blocks >= MAX_NUM_BLOCKS_IN_ROW) {
-            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * MAX_NUM_BLOCKS_IN_ROW) / 2;
+        if (number_of_blocks >= MaxNumBlocksInRow()) {
+            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * MaxNumBlocksInRow()) / 2;
         } else {            
-            float pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
+            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
         }
-        this->set_position({pos_x, kStartPosY});        
+        set_position((Vector2){pos_x, kStartPosY});        
 
         // Allocating blocks
         blocks = new (std::nothrow) Block[number_of_blocks];
@@ -41,12 +38,12 @@ Level :: Level(const Color& background_color, const int& level_num, const int& n
 
         // Setting starting position  
         float pos_x;                        
-        if (number_of_blocks >= MAX_NUM_BLOCKS_IN_ROW) {
-            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * MAX_NUM_BLOCKS_IN_ROW) / 2;
+        if (number_of_blocks >= MaxNumBlocksInRow()) {
+            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * MaxNumBlocksInRow()) / 2;
         } else {            
-            float pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
+            pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_blocks) / 2;
         }
-        this->set_position({pos_x, kStartPosY});        
+        set_position((Vector2){pos_x, kStartPosY});        
 
         // Allocating blocks
         blocks = new (std::nothrow) Block[number_of_blocks];
@@ -57,13 +54,13 @@ Level :: Level(const Color& background_color, const int& level_num, const int& n
 }
 
 void Level :: Draw() {   
-    const Vector2& level_start_position = this->get_position();
-    const int max_num_blocks_in_row = MAX_NUM_BLOCKS_IN_ROW;  
+    const Vector2& level_start_position = get_position();
+    const int max_num_blocks_in_row = MaxNumBlocksInRow();  
     const int max_num_of_rows_with_full_columns = (int) number_of_blocks / max_num_blocks_in_row;  
     int current_column_num = 0;                         // Starting with 0
 
     if (max_num_of_rows_with_full_columns == 0) {       // Only one row        
-        for (int i = 0; i < this->number_of_blocks; ++i) {
+        for (int i = 0; i < number_of_blocks; ++i) {
             if (i % max_num_blocks_in_row == 0) {
                 current_column_num = 0;
             } else {
@@ -81,7 +78,7 @@ void Level :: Draw() {
         const float last_row_start_pos_x = (SCREEN_WIDTH - (Block::kBlockWidth + Block::kBlockColumnOffset) * number_of_remain_blocks) / 2;
         int current_row_num = 0;                        // Starting with 0
 
-        for (int i = 0; i < this->number_of_blocks; ++i) {
+        for (int i = 0; i < number_of_blocks; ++i) {
             if (i % max_num_blocks_in_row == 0) {
                 current_column_num = 0;
                 if (i != 0) ++current_row_num;
@@ -105,9 +102,11 @@ void Level :: Draw() {
 }
 
 void Level :: Fall() {   
-    for (int i = 0; i < this->number_of_blocks; ++i) {
+    for (int i = 0; i < number_of_blocks; ++i) {
         if (blocks[i].is_falling() && !blocks[i].is_disabled()) blocks[i].Move();        
     }
 }
 
-#undef MAX_NUM_BLOCKS_IN_ROW
+bool Level :: is_level_finished() {
+    return (Block::num_of_disabled_blocks == number_of_blocks);
+} 
