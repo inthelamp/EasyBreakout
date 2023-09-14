@@ -112,8 +112,8 @@ const float Ball :: RandomSpeedOnX(const Vector2& speed, const int& level_num) c
 	if (fabs(speed.x) > medium_speed_on_x) direction = -1;
 	else direction = 1;
 
-	float random_speed = (speed.x < 0) ? -1 * direction * RandomRateOfSpeedOnX() : direction * RandomRateOfSpeedOnX();	
-	float speed_x = speed.x + random_speed;
+	const float random_speed = (speed.x < 0) ? -1 * direction * RandomRateOfSpeedOnX() : direction * RandomRateOfSpeedOnX();	
+	const float speed_x = speed.x + random_speed;
 
 	if (fabs(speed_x) > maximum_speed_on_x) {
 		return (speed.x < 0) ? -1 * maximum_speed_on_x : maximum_speed_on_x;

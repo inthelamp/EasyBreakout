@@ -42,8 +42,23 @@ int main(void)
 
     // Loading game objects
     //--------------------------------------------------------------------------------------
-    Level * level = new Level(RAYWHITE, 1, 7);
-    Player * player = new Player(level); 
+    Level * level = nullptr;
+    Player * player = nullptr;
+
+    if (FileExists(STORAGE_DATA_FILE)) {        
+        const int level_num = LoadStorageValue(STORAGE_POSITION_LEVEL);     
+        const int num_of_blocks = LoadStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS);  
+        const unsigned int score = LoadStorageValue(STORAGE_POSITION_SCORE);           
+        const unsigned int high_score = LoadStorageValue(STORAGE_POSITION_HIGH_SCORE);                  
+
+        level = new Level(RAYWHITE, level_num, num_of_blocks);
+        player = new Player(level); 
+        player->set_score(score);
+        player->set_high_score(high_score);
+    } else {
+        level = new Level(RAYWHITE, 1, 7);
+        player = new Player(level); 
+    }
     PlayingBar * playingBar = new PlayingBar(MAROON);    
     Ball * ball = new Ball(MAROON, playingBar->get_position().y, level->get_ball_speed());
 
@@ -75,9 +90,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         // UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
 
-        if (player->get_status() == intro) {
-
-        } else if (player->get_status() == play) {
+        if (player->get_status() == play) {
             if (IsKeyDown(KEY_ESCAPE)) player->set_status(intro);
 
             // Moving playing bat
@@ -114,6 +127,7 @@ int main(void)
             level->Fall();
 
             if (level->is_level_finished()) player->set_status(level_up);       // After completing the level, player goes to the next level   
+
         } else if (player->get_status() == out) {                               // Failed, try the same level again
             int level_num = level->get_level_num();
             int num_of_blocks = level->get_number_of_blocks();      
@@ -127,7 +141,10 @@ int main(void)
 
             // Initialize game objects
             player->set_level(level);
-            player->set_score(0);
+
+            // Load score from storage
+            const unsigned int score = LoadStorageValue(STORAGE_POSITION_SCORE);
+            player->set_score(score);
 
             playingBar->set_default_position();
 
@@ -139,9 +156,22 @@ int main(void)
             
             WaitTime(2);                                                        // Wait 2 seconds
 
-            player->set_status(play);                 
+            player->set_status(play);          
+
         } else if (player->get_status() == level_up) {
-            int level_num = level->get_level_num();
+            // Save player's data
+            int level_num = level->get_level_num();            
+            SaveStorageValue(STORAGE_POSITION_LEVEL, level_num);
+
+            const unsigned int score = player->get_score();
+            SaveStorageValue(STORAGE_POSITION_SCORE, score);
+
+            const unsigned int high_score = player->get_high_score();
+            if (score > high_score) {
+                player->set_high_score(score);
+                SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, score);
+            }    
+
             int num_of_blocks = level->get_number_of_blocks();      
 
             // Delete current level
@@ -164,9 +194,16 @@ int main(void)
             WaitTime(2);                                                        // Wait 2 seconds
 
             player->set_status(play);      
+
         } else if (player->get_status() == end) {
+            // Save player's data         
+            SaveStorageValue(STORAGE_POSITION_LEVEL, level->get_level_num());
+            SaveStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS, level->get_number_of_blocks());
+            SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, player->get_high_score());            
+
             exitWindow = WindowShouldClose();
         }
+
         //----------------------------------------------------------------------------------
         // Draw
         //----------------------------------------------------------------------------------
