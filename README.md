@@ -2,7 +2,7 @@
 Breakout game, an arcade video game, and so easy to play
 
 > Screenshot of Easy Breakout <br />
-![alt text](https://github.com/inthelamp/EasyBreakout/blob/main/EasyBreakout.png?raw=true "Easy Breakout")
+![alt text](https://github.com/inthelamp/EasyBreakout/EasyBreakout.png?raw=true "Easy Breakout")
 
 >To build the game<br />
 >>mkdir build    <br />
