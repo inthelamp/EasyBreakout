@@ -9,4 +9,4 @@ Breakout game, an arcade video game, and so easy to play
 >>cd build       <br />
 >>cmake .. -D CMAKE_BUILD_TYPE=MINSIZEREL <br />
 >>make       <br />      
->>make install <br />
+>>make install
