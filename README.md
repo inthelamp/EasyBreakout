@@ -13,8 +13,7 @@ Breakout game, an arcade video game, and so easy to play
 
 >To run the game<br />
 >>Find and go to <b>bin</b> directory <br />
->>./EasyBreak
-
+>>./EasyBreakout
 
 
 
