@@ -11,7 +11,7 @@
 #include <utility>
 #include "Level.h"
 
-enum player_status_t { intro, play, level_up, end, out };
+enum player_status_t { intro, play, level_up, out, end, goodbye };
 
 class Player {
 private:

@@ -199,11 +199,13 @@ int main(void)
             // Save player's data         
             SaveStorageValue(STORAGE_POSITION_LEVEL, level->get_level_num());
             SaveStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS, level->get_number_of_blocks());
-            SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, player->get_high_score());            
+            SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, player->get_high_score());  
 
+            player->set_status(goodbye);
+            
+        }  else if (player->get_status() == goodbye) {
             exitWindow = WindowShouldClose();
         }
-
         //----------------------------------------------------------------------------------
         // Draw
         //----------------------------------------------------------------------------------
@@ -245,7 +247,7 @@ int main(void)
             } else if (player->get_status() == level_up) {
                 ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));                
                 DrawText("Level up!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, BLACK);
-            } else if (player->get_status() == end) {
+            } else if (player->get_status() == goodbye) {
                 ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR))); 
                 DrawText("Goodbye!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, GRAY);
             }

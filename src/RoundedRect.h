@@ -45,7 +45,7 @@ public:
 	Rectangle get_rec() && { return std::move(rec); }
 
 	const Vector2 get_position() const {
-		return {rec.x, rec.y}; 
+		return (Vector2){rec.x, rec.y}; 
 	}
 
 	void set_position(const Vector2& position) { 
