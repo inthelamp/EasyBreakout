@@ -11,14 +11,14 @@
 #include <utility>
 #include "Level.h"
 
-enum player_status_t { intro, play, level_up, out, end, goodbye };
+enum player_state_t { intro, play, level_up, out, end, goodbye };
 
 class Player {
 private:
     Level * level;                                  // Game level
     unsigned int score = 0;                         // Game score   
     unsigned int high_score = 0;                    // High game score   
-    player_status_t status = intro;                 // Player status
+    player_state_t state = intro;                   // Player status
 
 public:     
     Player(Level * level);
@@ -30,10 +30,9 @@ public:
     void set_score(const unsigned int& score) { this->score = score; }
     const unsigned int& get_high_score() const { return high_score; }
     void set_high_score(const unsigned int& high_score) { this->high_score = high_score; }    
-	const player_status_t& get_status() const & { return status; }
-	player_status_t get_status() && { return std::move(status); }
-    void set_status(const player_status_t& status) { this->status = status; }
-    void set_status(player_status_t&& status) { this->status = std::move(status); }
+	const player_state_t& get_state() const & { return state; }
+	player_state_t get_state() && { return std::move(state); }
+    void set_state(const player_state_t& state) { this->state = state; }
 
     void AddScore(const int& points) {
         score += points;

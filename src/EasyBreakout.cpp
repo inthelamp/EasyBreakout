@@ -7,11 +7,6 @@
 
 #include <iostream>
 #include "raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
-
-// raygui embedded style
-#include "../include/bluish.h"
 
 #include "Ball.h"
 #include "MovingEntity.h"
@@ -21,6 +16,7 @@
 #include "StorageValue.h"
 #include "Block.h"
 #include "Player.h"
+#include "Button.h"
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -41,7 +37,7 @@ int main(void)
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "EasyBreakout");
 
     // Loading game objects
-    //--------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
     Level * level = nullptr;
     Player * player = nullptr;
 
@@ -66,6 +62,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     InitAudioDevice();                                                          // Initialize audio device
 
+    Sound button_sound = LoadSound("../assets/audio/button.wav");
     Sound hit_block_sound = LoadSound("../assets/audio/shoot.wav");             // Load hitting block audio file
     Sound hit_bar_sound = LoadSound("../assets/audio/hit.wav");                 // Load hitting bar audio file
     SetSoundVolume(hit_bar_sound, 0.5f);    
@@ -74,9 +71,14 @@ int main(void)
     // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
     // PlayMusicStream(background_sound);
 
-    // Load bluish style
-    GuiLoadStyleBluish();
+    // Loading buttons 
+    Texture2D play_button_texture = LoadTexture("../assets/images/play_buttons.png");
+    Button * play_button = new Button(&play_button_texture, &button_sound, SCREEN_WIDTH/2 - 130);
 
+    Texture2D end_button_texture = LoadTexture("../assets/images/end_buttons.png");   
+    Button * end_button = new Button(&end_button_texture, &button_sound, SCREEN_WIDTH/2 + 10);
+
+    Vector2 mouse_point = { 0.0f, 0.0f };
     bool exitWindow = false;
 
     SetTargetFPS(60);                               // Set our game to run at 60 frames-per-second
@@ -90,8 +92,25 @@ int main(void)
         //----------------------------------------------------------------------------------
         // UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
 
-        if (player->get_status() == play) {
-            if (IsKeyDown(KEY_ESCAPE)) player->set_status(intro);
+        if (player->get_state() == intro) {      
+            play_button->set_state(normal);
+            play_button->set_activated(false);   
+
+            end_button->set_state(normal); 
+            end_button->set_activated(false);       
+
+            mouse_point = GetMousePosition();      
+            play_button->check_click(mouse_point);
+            end_button->check_click(mouse_point);
+
+            if (play_button->get_activated()) {
+                player->set_state(play);                  
+            } else if (end_button->get_activated()) {
+                player->set_state(end);
+                WaitTime(0.2);                                                        // Wait 0.2 seconds                       
+            }   
+        } else if (player->get_state() == play) {
+            if (IsKeyDown(KEY_ESCAPE)) player->set_state(intro);
 
             // Moving playing bat
             playingBar->Move();
@@ -114,7 +133,7 @@ int main(void)
             Block * blocks = std::move(level->get_blocks());
             if ( const int block_num = ball->IsCollided(blocks, level->get_number_of_blocks()) != -1) {
                 if (ball->get_risk_rate() > 2) {
-                    player->set_status(out);
+                    player->set_state(out);
                 } else {
                     PlaySound(hit_block_sound);
                     ball->Collide(blocks[block_num].get_rec(), ball->get_speed());
@@ -126,9 +145,8 @@ int main(void)
             //----------------------------------------------------------------------------------
             level->Fall();
 
-            if (level->is_level_finished()) player->set_status(level_up);       // After completing the level, player goes to the next level   
-
-        } else if (player->get_status() == out) {                               // Failed, try the same level again
+            if (level->is_level_finished()) player->set_state(level_up);       // After completing the level, player goes to the next level   
+        } else if (player->get_state() == out) {                               // Failed, try the same level again
             int level_num = level->get_level_num();
             int num_of_blocks = level->get_number_of_blocks();      
 
@@ -156,9 +174,8 @@ int main(void)
             
             WaitTime(2);                                                        // Wait 2 seconds
 
-            player->set_status(play);          
-
-        } else if (player->get_status() == level_up) {
+            player->set_state(play);          
+        } else if (player->get_state() == level_up) {
             // Save player's data
             int level_num = level->get_level_num();            
             SaveStorageValue(STORAGE_POSITION_LEVEL, level_num);
@@ -193,17 +210,15 @@ int main(void)
             
             WaitTime(2);                                                        // Wait 2 seconds
 
-            player->set_status(play);      
-
-        } else if (player->get_status() == end) {
+            player->set_state(play);      
+        } else if (player->get_state() == end) {
             // Save player's data         
             SaveStorageValue(STORAGE_POSITION_LEVEL, level->get_level_num());
             SaveStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS, level->get_number_of_blocks());
             SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, player->get_high_score());  
 
-            player->set_status(goodbye);
-            
-        }  else if (player->get_status() == goodbye) {
+            player->set_state(goodbye);           
+        }  else if (player->get_state() == goodbye) {
             exitWindow = WindowShouldClose();
         }
         //----------------------------------------------------------------------------------
@@ -212,17 +227,13 @@ int main(void)
         BeginDrawing();
 
             // Introduction of game
-            if (player->get_status() == intro) {
-                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            if (player->get_state() == intro) {
+                ClearBackground(BACKGROUND_COLOR);
+
                 DrawText("Easy Breakout", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100 , 40, GREEN);
-                if (GuiButton((Rectangle){ SCREEN_WIDTH/2 - 115, SCREEN_HEIGHT/2, 125, 30 }, GuiIconText(ICON_PLAYER_PLAY, "Play"))) {
-                    player->set_status(play);                    
-                }    
-                if (GuiButton((Rectangle){ SCREEN_WIDTH/2 + 10, SCREEN_HEIGHT/2, 125, 30 }, GuiIconText(ICON_PLAYER_STOP, "End"))) {
-                    player->set_status(end);
-                }                            
-            // Playing game               
-            } else  if (player->get_status() == play) {
+                play_button->Draw();       
+                end_button->Draw();              
+            } else  if (player->get_state() == play) {             // Playing game         
                 ClearBackground(level->get_background_color());
 
                 level->Draw();
@@ -240,15 +251,17 @@ int main(void)
                 // Presenting player score
                 const std::string player_score = "Score : " + std::to_string(player->get_score());            
                 DrawText(player_score.c_str(), SCREEN_WIDTH - 140, 10, 20, DARKGRAY);   
+            } else if (player->get_state() == out) {
+                ClearBackground(BACKGROUND_COLOR);   
 
-            } else if (player->get_status() == out) {
-                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));                
                 DrawText("Try again!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, RED);
-            } else if (player->get_status() == level_up) {
-                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));                
+            } else if (player->get_state() == level_up) {
+                ClearBackground(BACKGROUND_COLOR);       
+
                 DrawText("Level up!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, BLACK);
-            } else if (player->get_status() == goodbye) {
-                ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR))); 
+            } else if (player->get_state() == goodbye) {
+                ClearBackground(BACKGROUND_COLOR); 
+
                 DrawText("Goodbye!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, GRAY);
             }
 
@@ -256,11 +269,16 @@ int main(void)
         //----------------------------------------------------------------------------------
     }
 
-    //----------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    UnloadTexture(play_button_texture);              // Unload button texture
+    UnloadTexture(end_button_texture);               // Unload button texture   
+
     UnloadSound(hit_block_sound);                    // Unload sound data
-    UnloadSound(hit_bar_sound);                      // Unload sound data    
+    UnloadSound(hit_bar_sound);                      // Unload sound data  
+    UnloadSound(button_sound);
+
     // UnloadMusicStream(background_sound);          // Unload music stream buffers from RAM
 
     // Deleting dynamic storages
@@ -268,6 +286,10 @@ int main(void)
     delete ball;
     delete playingBar;
     delete level;
+
+    // Deleting buttons
+    delete play_button;  
+    delete end_button;
 
     CloseAudioDevice();                             // Close audio device
 

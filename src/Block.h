@@ -31,16 +31,16 @@ inline Color ComplementaryColor (const Color& color)
 
 class Block : public MovingEntity, public RoundedRect {
 private:
+	constexpr static float kBlockFallingSpeed = 5.0f;         // Block falling speed on y-axis
+	constexpr static float kBlockRoundness = 0.2f;
+	constexpr static float kBlockSegments = 0.0f;
+	
 	const Color color;
 	const int point;
 
 	bool disabled = false; 
 	bool falling = false;
 	
-	constexpr static float kBlockFallingSpeed = 5.0f;         // Block falling speed on y-axis
-	constexpr static float kBlockRoundness = 0.2f;
-	constexpr static float kBlockSegments = 0.0f;
-
 public:
 	static int num_of_disabled_blocks;                        // Number of disabled blocks
 	constexpr static float kBlockWidth = 100.0f;

@@ -21,6 +21,8 @@ inline float RandomRateOfSpeedOnX() {
 class Ball final : public MovingEntity, public Circle {
 
 private:
+	constexpr static float kRadius = 10.0f;                	// Ball radius
+	
 	Color color;
 	bool held = true;										// Ball doesn't go out if playing bar is holding it 
 	bool enabled = true; 									// Enabled to crush blocks, preventing from falling other blocks nearby accidently
@@ -28,8 +30,6 @@ private:
 
 	// Angle of bouncing ball depends on the speed on x-axis, so getting its random speed	
 	const float RandomSpeedOnX(const Vector2& speed, const int& level_num) const;  
-
-	constexpr static float kRadius = 10.0f;                	// Ball radius
 
 public:
 	constexpr static float kInitalSpeedOnX = 2.0f;          // Initial ball speed on x-axis 
@@ -50,9 +50,10 @@ public:
 
 	bool IsHeld() const;
 	bool IsEnabled() const;
+	
 	const int get_risk_rate() const { return risk_rate; }
-	void set_risk_rate(const int& rate) { risk_rate = rate; }
 
+	void set_risk_rate(const int& rate) { risk_rate = rate; }
 	void set_held(const bool& held) { this->held = held; }
 	void set_enabled(const bool& enabled) { this->enabled = enabled; }
 
