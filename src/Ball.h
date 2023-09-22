@@ -36,7 +36,6 @@ private:
 public:
 	constexpr static float kInitalSpeedOnX = 2.0f;          // Initial ball speed on x-axis 
 	constexpr static float kInitalSpeedOnY = -6.0f;         // Initial ball speed on y-axis 
-	constexpr static float kSpeedIncrementRate = 0.2f;    	// Ball speed increment due to game level
 
 	Ball (const Sound * hit_bar_sound, const Sound * hit_block_sound, const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius = kRadius);
 	

@@ -10,9 +10,14 @@
 #include "PlayingBar.h"
 
 PlayingBar :: PlayingBar(const Color& color)
-					: MovingEntity(kPlayingBarSpeed), RoundedRect((Vector2){(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PlayingBarPosY(SCREEN_HEIGHT)}, 
+					: MovingEntity((Vector2){kPlayingBarSpeedOnX, 0.0f}), RoundedRect((Vector2){(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PlayingBarPosY(SCREEN_HEIGHT)}, 
 																	kPlayingBarWidth, kPlayingBarHeight, kPlayingBarRoundness, kPlayingBarSegments) {
 	this->color = color;
+}
+
+void PlayingBar :: set_speed(int level_num) {
+		const float speed_on_x  = (float) kPlayingBarSpeedOnX + level_num * kSpeedIncrementRate;
+		MovingEntity :: set_speed((Vector2){speed_on_x, 0.0f});
 }
 
 void PlayingBar :: Move() {

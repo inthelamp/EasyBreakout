@@ -19,7 +19,7 @@ inline float PlayingBarPosY(const float& screen_height) {
 
 class PlayingBar final : public MovingEntity, public RoundedRect {
 private:
-	constexpr static Vector2 kPlayingBarSpeed = {7.0f, 0.0f};
+	constexpr static float kPlayingBarSpeedOnX = 7.0f;
 	constexpr static float kPlayingBarWidth = 100.0f;
 	constexpr static float kPlayingBarHeight = 20.0f;
 	constexpr static float kPlayingBarRoundness = 0.2f;
@@ -29,6 +29,8 @@ private:
 	
 public:
 	PlayingBar(const Color& color);
+	
+	void set_speed(int level_num); 
 	void set_default_position() { set_position((Vector2){(float)SCREEN_WIDTH/2 - kPlayingBarWidth/2, PlayingBarPosY(SCREEN_HEIGHT)}); }
 	void Move() override;
 	void Draw() override;

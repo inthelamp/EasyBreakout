@@ -47,7 +47,6 @@ int main(void)
     // Initialization
     //----------------------------------------------------------------------------------
 
-
     // Loading game data
     //----------------------------------------------------------------------------------
 
@@ -279,6 +278,7 @@ void UpdateDrawFrame()
         // Initialize game objects
         player->set_level(level);
         playingBar->set_default_position();
+        playingBar->set_speed(level->get_level_num());
 
         ball->set_default_position(playingBar->get_position().y);
         ball->set_speed(level->get_ball_speed());
@@ -345,7 +345,7 @@ void UpdateDrawFrame()
 
             // Presenting player's high score
             const std::string player_high_score = "High score : " + std::to_string(player->get_high_score());               
-            DrawText(player_high_score.c_str(), SCREEN_WIDTH/2 - 180, SCREEN_HEIGHT/2 + 10 , 40, GRAY);            
+            DrawText(player_high_score.c_str(), SCREEN_WIDTH/2 - 160, SCREEN_HEIGHT/2 - 10, 40, GRAY);            
         }
 
     EndDrawing();

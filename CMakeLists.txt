@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.16)
 # Set the project name
 project (EasyBreakout)
 
-file(GLOB "${PROJECT_NAME}_SOURCES" ${CMAKE_SOURCE_DIR}/src/*.cpp)
+file(GLOB "${PROJECT_NAME}_SOURCES" "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 # Initialize CXXFLAGS
 set(CMAKE_CXX_FLAGS                "-Wall -std=c++17")
@@ -27,11 +27,11 @@ else ()
     message(FATAL_ERROR "Your C++ compiler does not support C++17.")
 endif ()
 
-add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES}
+                               ${CMAKE_SOURCE_DIR}/src/EasyBreakout.rc.data
+)
 
 # Add raylib library
-target_link_libraries(${PROJECT_NAME}
-    /usr/local/lib/libraylib.so
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC raylib)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/bin)

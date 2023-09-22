@@ -16,6 +16,8 @@ private:
 	Vector2 speed;
 
 public:
+	constexpr static float kSpeedIncrementRate = 0.2f;    	// Ball speed increment due to game level
+	
 	MovingEntity(const Vector2& speed) { this->speed = speed; }
 	virtual ~MovingEntity() { }
 
