@@ -22,8 +22,10 @@ class Ball final : public MovingEntity, public Circle {
 
 private:
 	constexpr static float kRadius = 10.0f;                	// Ball radius
-	
-	Color color;
+
+	const Sound * hit_bar_sound;							// Sound when it hits playing bar
+	const Sound * hit_block_sound;							// Sound when it hits blocks 	
+	const Color color;
 	bool held = true;										// Ball doesn't go out if playing bar is holding it 
 	bool enabled = true; 									// Enabled to crush blocks, preventing from falling other blocks nearby accidently
 	int risk_rate = 0;										// Risk rate
@@ -36,8 +38,16 @@ public:
 	constexpr static float kInitalSpeedOnY = -6.0f;         // Initial ball speed on y-axis 
 	constexpr static float kSpeedIncrementRate = 0.2f;    	// Ball speed increment due to game level
 
-	Ball (const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius = kRadius);
+	Ball (const Sound * hit_bar_sound, const Sound * hit_block_sound, const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius = kRadius);
 	
+	const int get_risk_rate() const { return risk_rate; }
+
+	void set_risk_rate(const int& rate) { risk_rate = rate; }
+	void set_held(const bool& held) { this->held = held; }
+	void set_enabled(const bool& enabled) { this->enabled = enabled; }
+
+	void set_default_position(const float& pos_y) { set_position((Vector2){(float)SCREEN_WIDTH/2, pos_y - get_radius()}); }
+
 	void Move() override;
 	void Draw() override;
 
@@ -47,17 +57,12 @@ public:
 	// Checking collision with blocks and returning the block number hit, otherwise returning -1
 	const int IsCollided(Block * blocks, const int& number_of_blocks);  
 	void Collide(const Rectangle& rec, const int& level_num);			// Colliding with playing bar		
-
 	bool IsHeld() const;
 	bool IsEnabled() const;
 	
-	const int get_risk_rate() const { return risk_rate; }
+	void play_hit_bar_sound() { PlaySound(*hit_bar_sound); }
+	void play_hit_block_sound() { PlaySound(*hit_block_sound); }
 
-	void set_risk_rate(const int& rate) { risk_rate = rate; }
-	void set_held(const bool& held) { this->held = held; }
-	void set_enabled(const bool& enabled) { this->enabled = enabled; }
-
-	void set_default_position(const float& pos_y) { set_position((Vector2){(float)SCREEN_WIDTH/2, pos_y - get_radius()}); }
 };
 
 #endif // BALL_H_

@@ -8,7 +8,6 @@
 #ifndef BUTTON_H_
 #define BUTTON_H_
 
-#include <memory>
 #include "EasyBreakout.h"
 #include "GraphicsEntity.h"
 
@@ -20,25 +19,30 @@ private:
     const Sound * sound = nullptr;
     button_state_t state = normal;
     bool activated = false;
-    Rectangle source_rectangle = (Rectangle){ 0, 0, (float)button->width, frame_height() };   
+    Rectangle source_rectangle;
 
     const float frame_height() {
         return (float)button->height / kNumberOfFrames;
     } 
 
     const Rectangle btn_bounds() { 
-        // return (Rectangle){ SCREEN_WIDTH/2.0f - button.width/2.0f, SCREEN_HEIGHT/2.0f - button.height/kNumberOfFrames/2.0f, (float)button.width, frame_height() };
         return (Rectangle){ this->get_position().x, this->get_position().y, (float)button->width, frame_height() };
     }   
 
 public:
     constexpr static int kNumberOfFrames = 3;
 
-	Button(const Texture2D * button) : GraphicsEntity((Vector2){SCREEN_WIDTH/2.0f - button->width/2.0f, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), button(button) { }
-	Button(const Texture2D * button, const float& pos_x) : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), button(button) { }	
+	Button(const Texture2D * button) 
+        : GraphicsEntity((Vector2){SCREEN_WIDTH/2.0f - button->width/2.0f, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
+        button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }
+	Button(const Texture2D * button, const float& pos_x) 
+        : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
+        button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }	
     Button(const Texture2D * button, const Sound * sound, const float& pos_x) 
-        : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), sound(sound), button(button) { }
-    Button(const Texture2D * button, const Sound * sound, const Vector2& position) : GraphicsEntity(position), sound(sound), button(button) { }
+        : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
+        sound(sound), button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }        
+    Button(const Texture2D * button, const Sound * sound, const Rectangle& source_rec, const Vector2& position) 
+        : GraphicsEntity(position), sound(sound), button(button), source_rectangle(source_rec) { }
 	virtual ~Button() { }
 
     const button_state_t& get_state() const & { return state; }

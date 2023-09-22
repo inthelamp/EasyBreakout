@@ -19,7 +19,6 @@ inline int MaxNumBlocksInRow() {
 
 class Level : public GraphicsEntity {    
 private:
-	constexpr static int kMaxLevelNumber = 20; // Maximum level number to be reached
     constexpr static float kStartPosY = 50.0f; // Position on y-axis where the first row of blocks starts
 
     Block * blocks;
@@ -29,6 +28,8 @@ private:
     const Vector2 ball_speed;                   // Ball speed of level    
 
 public:    
+	constexpr static int kMaxLevelNumber = 2; // Maximum level number to be reached
+
     Level(const Color& background_color, const int& level_num, const int& number_of_blocks);
     Level(const Color& background_color, const int& level_num, const int& number_of_blocks, const Vector2& ball_speed);
     virtual ~Level() {

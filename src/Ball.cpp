@@ -10,9 +10,10 @@
 #include "Ball.h"
 
 // Initializing ball 
-Ball :: Ball (const Color& color, const float& playing_bar_position_y, const Vector2& speed, const int& radius)
-			: MovingEntity(speed), Circle((Vector2){(float)SCREEN_WIDTH/2, playing_bar_position_y - radius}, radius) {
-		this->color = color;
+Ball :: Ball (const Sound * hit_bar_sound, const Sound * hit_block_sound, const Color& color, 
+				const float& playing_bar_position_y, const Vector2& speed, const int& radius) : MovingEntity(speed), 
+				Circle((Vector2){(float)SCREEN_WIDTH/2, playing_bar_position_y - radius}, radius), 
+				hit_bar_sound(hit_bar_sound), hit_block_sound(hit_block_sound), color(color) {
 }
 
 bool Ball :: IsHeld() const {
@@ -73,6 +74,7 @@ const int Ball :: IsCollided(Block * blocks, const int& number_of_blocks) {
 	return -1;
 }
 
+// Colliding with rectangle 
 void Ball :: Collide(const Rectangle& rec, const Vector2& speed) {
 	const auto position = get_position();
 	const auto radius = get_radius();
