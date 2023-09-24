@@ -16,7 +16,7 @@ PlayingBar :: PlayingBar(const Color& color)
 }
 
 void PlayingBar :: set_speed(int level_num) {
-		const float speed_on_x  = (float) kPlayingBarSpeedOnX + level_num * kSpeedIncrementRate;
+		const float speed_on_x  = (float) kPlayingBarSpeedOnX + level_num * kSpeedIncrementRate * 2;
 		MovingEntity :: set_speed((Vector2){speed_on_x, 0.0f});
 }
 

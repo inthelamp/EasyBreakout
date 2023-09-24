@@ -13,7 +13,7 @@
 #include "RoundedRect.h"
 
 // Getting intial y-axis position of playing bar 
-inline float PlayingBarPosY(const float& screen_height) {
+inline constexpr float PlayingBarPosY(const float& screen_height) {
     return screen_height - 50;
 }
 

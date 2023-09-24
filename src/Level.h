@@ -13,7 +13,7 @@
 #include "GraphicsEntity.h"
 #include "Block.h"
 
-inline int MaxNumBlocksInRow() {
+inline constexpr int MaxNumBlocksInRow() {
     return (int)(SCREEN_WIDTH / (Block::kBlockWidth + Block::kBlockColumnOffset));
 } 
 

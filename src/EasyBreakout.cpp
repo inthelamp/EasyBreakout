@@ -64,16 +64,16 @@ int main(void)
     const char * hit_bar_sound_file_name = "/audio/hit.wav";    
     const char * hit_block_sound_file_name = "/audio/shoot.wav";        
 #else    
-    const char * button_sound_file_name = "../assets/audio/button.wav";
-    const char * hit_bar_sound_file_name = "../assets/audio/hit.wav";    
-    const char * hit_block_sound_file_name = "../assets/audio/shoot.wav";      
+    const char * button_sound_file_name = "./resources/audio/button.wav";
+    const char * hit_bar_sound_file_name = "./resources/audio/hit.wav";    
+    const char * hit_block_sound_file_name = "./resources/audio/shoot.wav";      
 #endif
 
-    Sound button_sound = LoadSound(button_sound_file_name);
-    Sound hit_bar_sound = LoadSound(hit_bar_sound_file_name);                       // Load hitting bar audio file    
-    Sound hit_block_sound = LoadSound(hit_block_sound_file_name);                   // Load hitting block audio file
+    const Sound button_sound = LoadSound(button_sound_file_name);
+    const Sound hit_bar_sound = LoadSound(hit_bar_sound_file_name);                       // Load hitting bar audio file    
+    const Sound hit_block_sound = LoadSound(hit_block_sound_file_name);                   // Load hitting block audio file
     SetSoundVolume(hit_bar_sound, 0.5f);    
-    // Music background_sound = LoadMusicStream("../assets/audio/background.wav");  // Load background sound audio file
+    // Music background_sound = LoadMusicStream("./resources/audio/background.wav");  // Load background sound audio file
     // background_sound.looping = true;
     // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
     // PlayMusicStream(background_sound);
@@ -84,14 +84,14 @@ int main(void)
     const char * play_button_texture_file_name = "/images/play_buttons.png";
     const char * end_button_texture_file_name = "/images/end_buttons.png";          
 #else    
-    const char * play_button_texture_file_name = "../assets/images/play_buttons.png";
-    const char * end_button_texture_file_name = "../assets/images/end_buttons.png";      
+    const char * play_button_texture_file_name = "./resources/images/play_buttons.png";
+    const char * end_button_texture_file_name = "./resources/images/end_buttons.png";      
 #endif   
 
-    Texture2D play_button_texture = LoadTexture(play_button_texture_file_name);
+    const Texture2D play_button_texture = LoadTexture(play_button_texture_file_name);
     play_button = new Button(&play_button_texture, &button_sound, SCREEN_WIDTH/2 - 130);
 
-    Texture2D end_button_texture = LoadTexture(end_button_texture_file_name);   
+    const Texture2D end_button_texture = LoadTexture(end_button_texture_file_name);   
     end_button = new Button(&end_button_texture, &button_sound, SCREEN_WIDTH/2 + 10);
 
     // Loading game objects
@@ -224,8 +224,8 @@ void UpdateDrawFrame()
             else player->set_state(end);                                                            // Player ends the game after finishing all levels
         }
     } else if (player->get_state() == out) {                                                        // Failed, try the same level again
-        int level_num = level->get_level_num();
-        int num_of_blocks = level->get_number_of_blocks();      
+        const int level_num = level->get_level_num();
+        const int num_of_blocks = level->get_number_of_blocks();      
 
         // Delete current level
         delete level;
@@ -266,7 +266,7 @@ void UpdateDrawFrame()
             SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, score);
         }    
 
-        int num_of_blocks = level->get_number_of_blocks();      
+        const int num_of_blocks = level->get_number_of_blocks();      
 
         // Delete current level
         delete level;
@@ -278,7 +278,7 @@ void UpdateDrawFrame()
         // Initialize game objects
         player->set_level(level);
         playingBar->set_default_position();
-        playingBar->set_speed(level->get_level_num());
+        playingBar->set_speed(level->get_level_num());                      // Increase playing bar speed
 
         ball->set_default_position(playingBar->get_position().y);
         ball->set_speed(level->get_ball_speed());
@@ -312,7 +312,7 @@ void UpdateDrawFrame()
             DrawText("Easy Breakout", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100 , 40, GREEN);
             play_button->Draw();       
             end_button->Draw();              
-        } else  if (player->get_state() == play) {             // Playing game         
+        } else  if (player->get_state() == play) {                          // Playing game         
             ClearBackground(level->get_background_color());
 
             level->Draw();

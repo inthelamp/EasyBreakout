@@ -11,12 +11,12 @@
 #include "raylib.h"
 
 // Screen size
-const int SCREEN_WIDTH  = 960;                  // Screen width       
-const int SCREEN_HEIGHT = 540;                  // Screen height 
+constexpr int SCREEN_WIDTH  = 960;                  // Screen width       
+constexpr int SCREEN_HEIGHT = 540;                  // Screen height 
 
-const Color BACKGROUND_COLOR = RAYWHITE;        // Background color
+constexpr Color BACKGROUND_COLOR = RAYWHITE;        // Background color
 
 // Audio definition
-const float BACKGROUND_SOUND_VOLUMN = 0.2f;     // Background sound volumn, 1.0 is maximum
+constexpr float BACKGROUND_SOUND_VOLUMN = 0.2f;     // Background sound volumn, 1.0 is maximum
 
 #endif // EASY_BREAKOUT_ 

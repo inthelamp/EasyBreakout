@@ -24,7 +24,7 @@ inline int RandomPoints() {
 }
 
 // Getting complementary color
-inline Color ComplementaryColor (const Color& color)
+inline constexpr Color ComplementaryColor (const Color& color)
 {
     return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
 }

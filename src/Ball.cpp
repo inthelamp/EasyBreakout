@@ -65,7 +65,7 @@ const int Ball :: IsCollided(Block * blocks, const int& number_of_blocks) {
 	for (int i = 0; i < number_of_blocks; ++i) {
 		if (enabled && !blocks[i].is_falling() && IsCollided(blocks[i].get_rec())) {
 			blocks[i].set_falling();
-			enabled = false;					// It is disabled to prevent from falling other blocks nearby accidently
+			enabled = false;					// It is disabled to prevent from having other blocks fallen nearby accidently
 			++risk_rate;
 			return i;
 		}
