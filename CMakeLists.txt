@@ -39,7 +39,7 @@ endif()
 # EasyBreakout project
 file(GLOB "${PROJECT_NAME}_SOURCES" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-set(CMAKE_CXX_FLAGS                "-Wall -std=c++17")
+set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
 set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
@@ -68,9 +68,6 @@ if(CMAKE_SYSTEM MATCHES Windows)
     
     # Add resource file
     target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.rc.data)
-
-    # Update executable output file name for Windows
-    set(OUTPUT_FILE_NAME "${OUTPUT_FILE_NAME}.exe") 
 endif()
 
 # Add raylib library

@@ -12,7 +12,7 @@
 #if defined(EMSCRIPTEN)  
 const char * STORAGE_DATA_FILE = "/data/storage.data";          
 #else    
-const char * STORAGE_DATA_FILE = "../assets/data/storage.data";    
+const char * STORAGE_DATA_FILE = "./resources/data/storage.data";    
 #endif   
 
 // NOTE: Storage positions must start with 0, directly related to file memory layout
