@@ -31,7 +31,8 @@ Ball * ball = nullptr;
 Button * play_button = nullptr;
 Button * end_button = nullptr;
 Vector2 mouse_point = { 0.0f, 0.0f };
-bool exitWindow = false;
+bool exit_window = false;
+bool is_key_space_down = false;
 
 //----------------------------------------------------------------------------------
 // Module functions declaration
@@ -120,7 +121,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!exitWindow)    
+    while (!exit_window)    
     {
         UpdateDrawFrame();
     }
@@ -190,7 +191,11 @@ void UpdateDrawFrame()
         playingBar->Move();
 
         // Bouncing ball logic
-        if (ball->IsHeld() && IsKeyDown(KEY_SPACE)) ball->set_held(false);
+        if (ball->IsHeld() && IsKeyDown(KEY_SPACE)) {
+            ball->set_held(false);
+            is_key_space_down = true;
+        }   
+
         if (!ball->IsHeld()) {
             ball->Move();    
         } else {
@@ -224,6 +229,8 @@ void UpdateDrawFrame()
             else player->set_state(end);                                                            // Player ends the game after finishing all levels
         }
     } else if (player->get_state() == out) {                                                        // Failed, try the same level again
+        is_key_space_down = false;
+
         const int level_num = level->get_level_num();
         const int num_of_blocks = level->get_number_of_blocks();      
 
@@ -253,6 +260,8 @@ void UpdateDrawFrame()
 
         player->set_state(play);          
     } else if (player->get_state() == level_up) {
+        is_key_space_down = false;
+
         // Save player's data
         int level_num = level->get_level_num();            
         SaveStorageValue(STORAGE_POSITION_LEVEL, level_num);
@@ -297,7 +306,7 @@ void UpdateDrawFrame()
 
         player->set_state(goodbye);           
     }  else if (player->get_state() == goodbye) {
-        exitWindow = WindowShouldClose();                                   // Detect window close button or ESC key
+        exit_window = WindowShouldClose();                                   // Detect window close button or ESC key
     }
     
     //----------------------------------------------------------------------------------
@@ -329,7 +338,11 @@ void UpdateDrawFrame()
 
             // Presenting player's score
             const std::string player_score = "Score : " + std::to_string(player->get_score());            
-            DrawText(player_score.c_str(), SCREEN_WIDTH - 140, 10, 20, DARKGRAY);   
+            DrawText(player_score.c_str(), SCREEN_WIDTH - 140, 10, 20, DARKGRAY);  
+
+            if (!is_key_space_down) {
+                DrawText("Press space bar to start.", SCREEN_WIDTH - 275, SCREEN_HEIGHT - 50 , 20, Fade(GRAY, 0.5f));
+            }
         } else if (player->get_state() == out) {
             ClearBackground(BACKGROUND_COLOR);   
 
