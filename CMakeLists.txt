@@ -67,7 +67,7 @@ if(CMAKE_SYSTEM MATCHES Windows)
     message(STATUS "Target system is Windows")
     
     # Add resource file
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.rc.data)
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.rc)
 endif()
 
 # Add raylib library
