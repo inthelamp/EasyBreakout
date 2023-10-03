@@ -5,39 +5,23 @@
  *      Author: Dong Won Kim
  */
 
-#include <iostream>
-#include "raylib.h"
-
-//#define PLATFORM_WEB
-#if defined(EMSCRIPTEN)
-    #include <emscripten/emscripten.h>
-#endif
-
-#include "Ball.h"
-#include "MovingEntity.h"
-#include "PlayingBar.h"
-#include "Level.h"
 #include "EasyBreakout.h"
-#include "StorageValue.h"
-#include "Block.h"
-#include "Player.h"
-#include "Button.h"
 
 // Define global variables
-Level * level = nullptr;
-Player * player = nullptr;
-PlayingBar * playingBar = nullptr; 
-Ball * ball = nullptr;
-Button * play_button = nullptr;
-Button * end_button = nullptr;
-Vector2 mouse_point = { 0.0f, 0.0f };
+Level *level = nullptr;
+Player *player = nullptr;
+PlayingBar *playingBar = nullptr;
+Ball *ball = nullptr;
+Button *play_button = nullptr;
+Button *end_button = nullptr;
+Vector2 mouse_point = {0.0f, 0.0f};
 bool exit_window = false;
 bool is_key_space_down = false;
 
 //----------------------------------------------------------------------------------
 // Module functions declaration
 //----------------------------------------------------------------------------------
-void UpdateDrawFrame(void);     // Update and Draw one frame
+void UpdateDrawFrame(void); // Update and Draw one frame
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -51,77 +35,81 @@ int main(void)
     // Loading game data
     //----------------------------------------------------------------------------------
 
-
     // Initializing window
     //----------------------------------------------------------------------------------
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "EasyBreakout");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT); // Make the window resizable
+    InitWindow(WindowManager::window_width(), WindowManager::window_height(), "EasyBreakout");
+    SetWindowMinSize(WindowManager::kWindowMinWidth, WindowManager::kWindowMinHeight);
 
     // Initializing game sound
     //--------------------------------------------------------------------------------------
-    InitAudioDevice();                                                              // Initialize audio device
+    InitAudioDevice(); // Initialize audio device
 
 #if defined(EMSCRIPTEN)
-    const char * button_sound_file_name = "/audio/button.wav";
-    const char * hit_bar_sound_file_name = "/audio/hit.wav";    
-    const char * hit_block_sound_file_name = "/audio/shoot.wav";        
-#else    
-    const char * button_sound_file_name = "./resources/audio/button.wav";
-    const char * hit_bar_sound_file_name = "./resources/audio/hit.wav";    
-    const char * hit_block_sound_file_name = "./resources/audio/shoot.wav";      
+    const char *button_sound_file_name = "/audio/button.wav";
+    const char *hit_bar_sound_file_name = "/audio/hit.wav";
+    const char *hit_block_sound_file_name = "/audio/shoot.wav";
+#else
+    const char *button_sound_file_name = "./resources/audio/button.wav";
+    const char *hit_bar_sound_file_name = "./resources/audio/hit.wav";
+    const char *hit_block_sound_file_name = "./resources/audio/shoot.wav";
 #endif
 
     const Sound button_sound = LoadSound(button_sound_file_name);
-    const Sound hit_bar_sound = LoadSound(hit_bar_sound_file_name);                       // Load hitting bar audio file    
-    const Sound hit_block_sound = LoadSound(hit_block_sound_file_name);                   // Load hitting block audio file
-    SetSoundVolume(hit_bar_sound, 0.5f);    
+    const Sound hit_bar_sound = LoadSound(hit_bar_sound_file_name);     // Load hitting bar audio file
+    const Sound hit_block_sound = LoadSound(hit_block_sound_file_name); // Load hitting block audio file
+    SetSoundVolume(hit_bar_sound, 0.5f);
     // Music background_sound = LoadMusicStream("./resources/audio/background.wav");  // Load background sound audio file
     // background_sound.looping = true;
     // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
     // PlayMusicStream(background_sound);
 
-    // Loading buttons 
+    // Loading buttons
 
 #if defined(EMSCRIPTEN)
-    const char * play_button_texture_file_name = "/images/play_buttons.png";
-    const char * end_button_texture_file_name = "/images/end_buttons.png";          
-#else    
-    const char * play_button_texture_file_name = "./resources/images/play_buttons.png";
-    const char * end_button_texture_file_name = "./resources/images/end_buttons.png";      
-#endif   
+    const char *play_button_texture_file_name = "/images/play_buttons.png";
+    const char *end_button_texture_file_name = "/images/end_buttons.png";
+#else
+    const char *play_button_texture_file_name = "./resources/images/play_buttons.png";
+    const char *end_button_texture_file_name = "./resources/images/end_buttons.png";
+#endif
 
     const Texture2D play_button_texture = LoadTexture(play_button_texture_file_name);
-    play_button = new Button(&play_button_texture, &button_sound, SCREEN_WIDTH/2 - 130);
+    play_button = new Button(&play_button_texture, &button_sound, -130);
 
-    const Texture2D end_button_texture = LoadTexture(end_button_texture_file_name);   
-    end_button = new Button(&end_button_texture, &button_sound, SCREEN_WIDTH/2 + 10);
+    const Texture2D end_button_texture = LoadTexture(end_button_texture_file_name);
+    end_button = new Button(&end_button_texture, &button_sound, 10);
 
     // Loading game objects
     //----------------------------------------------------------------------------------
-    if (FileExists(STORAGE_DATA_FILE)) {        
-        const int level_num = LoadStorageValue(STORAGE_POSITION_LEVEL);     
-        const int num_of_blocks = LoadStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS);  
-        const unsigned int score = LoadStorageValue(STORAGE_POSITION_SCORE);           
-        const unsigned int high_score = LoadStorageValue(STORAGE_POSITION_HIGH_SCORE);                  
+    if (FileExists(StorageValue::storage_data_file()))
+    {
+        const int level_num = StorageValue::LoadStorageValue(kStoragePositionLevel);
+        const int num_of_blocks = StorageValue::LoadStorageValue(kStoragePositionNumOfBlock);
+        const unsigned int score = StorageValue::LoadStorageValue(kStoragePositionScore);
+        const unsigned int high_score = StorageValue::LoadStorageValue(kStoragePositionHighScore);
 
-        level = new Level(RAYWHITE, level_num, num_of_blocks);
-        player = new Player(level); 
+        level = new Level(level_num, num_of_blocks, RAYWHITE);
+        player = new Player(level);
         player->set_score(score);
         player->set_high_score(high_score);
-    } else {
-        level = new Level(RAYWHITE, 1, 7);
-        player = new Player(level); 
     }
-    playingBar = new PlayingBar(MAROON);    
-    ball = new Ball(&hit_bar_sound, &hit_block_sound, MAROON, playingBar->get_position().y, level->get_ball_speed());    
+    else
+    {
+        level = new Level(1, 7, RAYWHITE);
+        player = new Player(level);
+    }
+    playingBar = new PlayingBar(MAROON);
+    ball = new Ball(hit_bar_sound, hit_block_sound, MAROON, playingBar->get_position().y, level->get_ball_speed());
 
 #if defined(EMSCRIPTEN)
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
 #else
-    SetTargetFPS(60);       // Set our game to run at 60 frames-per-second
+    SetTargetFPS(60); // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!exit_window)    
+    while (!exit_window)
     {
         UpdateDrawFrame();
     }
@@ -130,11 +118,11 @@ int main(void)
     //--------------------------------------------------------------------------------------
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadTexture(play_button_texture);              // Unload button texture
-    UnloadTexture(end_button_texture);               // Unload button texture   
+    UnloadTexture(play_button_texture); // Unload button texture
+    UnloadTexture(end_button_texture);  // Unload button texture
 
-    UnloadSound(hit_block_sound);                    // Unload sound data
-    UnloadSound(hit_bar_sound);                      // Unload sound data  
+    UnloadSound(hit_block_sound); // Unload sound data
+    UnloadSound(hit_bar_sound);   // Unload sound data
     UnloadSound(button_sound);
 
     // UnloadMusicStream(background_sound);          // Unload music stream buffers from RAM
@@ -146,12 +134,12 @@ int main(void)
     delete level;
 
     // Deleting buttons
-    delete play_button;  
+    delete play_button;
     delete end_button;
 
-    CloseAudioDevice();                             // Close audio device
+    CloseAudioDevice(); // Close audio device
 
-    CloseWindow();                                  // Close window and OpenGL context
+    CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
     return 0;
@@ -162,90 +150,112 @@ int main(void)
 //----------------------------------------------------------------------------------
 void UpdateDrawFrame()
 {
-    //----------------------------------------------------------------------------------        
+    //----------------------------------------------------------------------------------
     // Update
     //----------------------------------------------------------------------------------
-    // UpdateMusicStream(background_sound);      // Update music buffer with new stream data 
+    // UpdateMusicStream(background_sound);      // Update music buffer with new stream data
 
-    if (player->get_state() == intro) {      
-        play_button->set_state(normal);
-        play_button->set_activated(false);   
+    if (player->get_state() == kIntro)
+    {
+        play_button->set_state(kNormal);
+        play_button->set_activated(false);
 
-        end_button->set_state(normal); 
-        end_button->set_activated(false);       
+        end_button->set_state(kNormal);
+        end_button->set_activated(false);
 
-        mouse_point = GetMousePosition();      
+        mouse_point = GetMousePosition();
         play_button->check_click(mouse_point);
         end_button->check_click(mouse_point);
 
-        if (play_button->get_activated()) {
-            player->set_state(play);                  
-        } else if (end_button->get_activated()) {
-            player->set_state(end);
-            WaitTime(0.2);                                                        // Wait 0.2 seconds                       
-        }   
-    } else if (player->get_state() == play) {
-        if (IsKeyDown(KEY_ESCAPE)) player->set_state(intro);
+        if (play_button->is_activated())
+        {
+            player->set_state(kPlay);
+        }
+        else if (end_button->is_activated())
+        {
+            player->set_state(kEnd);
+            WaitTime(0.2); // Wait 0.2 seconds
+        }
+    }
+    else if (player->get_state() == kPlay)
+    {
+        if (IsKeyDown(KEY_ESCAPE))
+            player->set_state(kIntro);
 
         // Moving playing bat
         playingBar->Move();
 
+        const Rectangle play_bar_shape = playingBar->get_shape();
+
         // Bouncing ball logic
-        if (ball->IsHeld() && IsKeyDown(KEY_SPACE)) {
+        if (ball->is_held() && IsKeyDown(KEY_SPACE))
+        {
             ball->set_held(false);
             is_key_space_down = true;
-        }   
-
-        if (!ball->IsHeld()) {
-            ball->Move();    
-        } else {
-            ball->set_position_x(playingBar->get_position_x() + playingBar->get_rec().width / 2); // Move along with the playing bar
-        }   
-
-        // When the ball hits the playing bar
-        if (ball->IsCollided(playingBar->get_rec()) && !ball->IsHeld()) {
-            ball->play_hit_bar_sound();
-            ball->Collide(playingBar->get_rec(), level->get_level_num());
         }
 
-        // When the ball hits blocks 
-        Block * blocks = std::move(level->get_blocks());
-        if ( const int block_num = ball->IsCollided(blocks, level->get_number_of_blocks()) != -1) {
-            if (ball->get_risk_rate() > 2) {
-                player->set_state(out);
-            } else {
-                ball->play_hit_block_sound();
-                ball->Collide(blocks[block_num].get_rec(), ball->get_speed());
-                player->AddScore(blocks[block_num].get_point());    
-            }                                            
+        if (!ball->is_held())
+        {
+            ball->Move();
+        }
+        else
+        {
+            ball->set_position_x(playingBar->get_position_x() + play_bar_shape.width / 2); // Move along with the playing bar
+        }
+
+        // When the ball hits the playing bar
+        if (ball->IsCollided(play_bar_shape) && !ball->is_held())
+        {
+            ball->PlayHitBarSound();
+            ball->Collide(play_bar_shape, level->get_level_num());
+        }
+
+        // When the ball hits blocks
+        Block *blocks = std::move(level->get_blocks());
+        if (const int block_num = ball->CollidedBlock(blocks, level->get_number_of_blocks()) != -1)
+        {
+            if (ball->get_risk_rate() > 2)
+            {
+                player->set_state(kOut);
+            }
+            else
+            {
+                ball->PlayHitBlockSound();
+                ball->Collide(blocks[block_num].get_shape(), ball->get_speed());
+                player->AddScore(blocks[block_num].get_point());
+            }
         }
 
         // Falling blocks after collision
         //----------------------------------------------------------------------------------
         level->Fall();
 
-        if (level->is_level_finished()) { 
-            if (level->get_level_num() < Level::kMaxLevelNumber) player->set_state(level_up);       // Player goes to the next level
-            else player->set_state(end);                                                            // Player ends the game after finishing all levels
+        if (level->IsLevelFinished())
+        {
+            if (level->get_level_num() < Level::kMaxLevelNumber)
+                player->set_state(kLevelUp); // Player goes to the next level
+            else
+                player->set_state(kEnd); // Player ends the game after finishing all levels
         }
-    } else if (player->get_state() == out) {                                                        // Failed, try the same level again
+    }
+    else if (player->get_state() == kOut)
+    { // Failed, try the same level again
         is_key_space_down = false;
 
         const int level_num = level->get_level_num();
-        const int num_of_blocks = level->get_number_of_blocks();      
+        const int num_of_blocks = level->get_number_of_blocks();
 
         // Delete current level
         delete level;
 
         // Load new level data
-        Block::num_of_disabled_blocks = 0;
-        level = new Level(RAYWHITE, level_num, num_of_blocks);
+        level = new Level(level_num, num_of_blocks, RAYWHITE);
 
         // Initialize game objects
         player->set_level(level);
 
         // Load score from storage
-        const unsigned int score = LoadStorageValue(STORAGE_POSITION_SCORE);
+        const unsigned int score = StorageValue::LoadStorageValue(kStoragePositionScore);
         player->set_score(score);
 
         playingBar->set_default_position();
@@ -255,205 +265,137 @@ void UpdateDrawFrame()
         ball->set_held(true);
         ball->set_enabled(true);
         ball->set_risk_rate(0);
-        
-        WaitTime(2);                                                        // Wait 2 seconds
 
-        player->set_state(play);          
-    } else if (player->get_state() == level_up) {
+        WaitTime(2); // Wait 2 seconds
+
+        player->set_state(kPlay);
+    }
+    else if (player->get_state() == kLevelUp)
+    {
         is_key_space_down = false;
 
         // Save player's data
-        int level_num = level->get_level_num();            
-        SaveStorageValue(STORAGE_POSITION_LEVEL, level_num);
+        int level_num = level->get_level_num();
+        StorageValue::SaveStorageValue(kStoragePositionLevel, level_num);
 
         const unsigned int score = player->get_score();
-        SaveStorageValue(STORAGE_POSITION_SCORE, score);
+        StorageValue::SaveStorageValue(kStoragePositionScore, score);
 
         const unsigned int high_score = player->get_high_score();
-        if (score > high_score) {
+        if (score > high_score)
+        {
             player->set_high_score(score);
-            SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, score);
-        }    
+            StorageValue::SaveStorageValue(kStoragePositionHighScore, score);
+        }
 
-        const int num_of_blocks = level->get_number_of_blocks();      
+        const int num_of_blocks = level->get_number_of_blocks();
 
         // Delete current level
         delete level;
 
         // Load new level data
-        Block::num_of_disabled_blocks = 0;
-        level = new Level(RAYWHITE, ++level_num, num_of_blocks + 5);
+        level = new Level(++level_num, num_of_blocks + 5, RAYWHITE);
 
         // Initialize game objects
         player->set_level(level);
         playingBar->set_default_position();
-        playingBar->set_speed(level->get_level_num());                      // Increase playing bar speed
+        playingBar->set_speed(level->get_level_num()); // Increase playing bar speed
 
         ball->set_default_position(playingBar->get_position().y);
         ball->set_speed(level->get_ball_speed());
         ball->set_held(true);
         ball->set_enabled(true);
-        ball->set_risk_rate(0);            
-        
-        WaitTime(2);                                                        // Wait 2 seconds
+        ball->set_risk_rate(0);
 
-        player->set_state(play);      
-    } else if (player->get_state() == end) {
-        // Save player's data         
-        SaveStorageValue(STORAGE_POSITION_LEVEL, level->get_level_num());
-        SaveStorageValue(STORAGE_POSITION_NUM_OF_BLOCKS, level->get_number_of_blocks());
-        SaveStorageValue(STORAGE_POSITION_HIGH_SCORE, player->get_high_score());  
+        WaitTime(2); // Wait 2 seconds
 
-        player->set_state(goodbye);           
-    }  else if (player->get_state() == goodbye) {
-        exit_window = WindowShouldClose();                                   // Detect window close button or ESC key
+        player->set_state(kPlay);
     }
-    
+    else if (player->get_state() == kEnd)
+    {
+        // Save player's data
+        StorageValue::SaveStorageValue(kStoragePositionLevel, level->get_level_num());
+        StorageValue::SaveStorageValue(kStoragePositionNumOfBlock, level->get_number_of_blocks());
+        StorageValue::SaveStorageValue(kStoragePositionHighScore, player->get_high_score());
+
+        player->set_state(kGoodbye);
+    }
+    else if (player->get_state() == kGoodbye)
+    {
+        exit_window = WindowShouldClose(); // Detect window close button or ESC key
+    }
+
     //----------------------------------------------------------------------------------
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
-        // Introduction of game
-        if (player->get_state() == intro) {
-            ClearBackground(BACKGROUND_COLOR);
+    // Introduction of game
+    if (player->get_state() == kIntro)
+    {
+        ClearBackground(kBackgroundColor);
 
-            DrawText("Easy Breakout", SCREEN_WIDTH/2 - 150, SCREEN_HEIGHT/2 - 100 , 40, GREEN);
-            play_button->Draw();       
-            end_button->Draw();              
-        } else  if (player->get_state() == play) {                          // Playing game         
-            ClearBackground(level->get_background_color());
+        WindowManager::DisplayText(kCentre, "Easy Breakout", -150, -100, 40, GREEN);
+        play_button->Draw();
+        end_button->Draw();
+    }
+    else if (player->get_state() == kPlay)
+    { // Playing game
+        ClearBackground(level->get_background_color());
 
-            level->Draw();
-            playingBar->Draw();            
-            ball->Draw();
+        level->Draw();
+        playingBar->Draw();
+        ball->Draw();
 
-            // Presenting player current level
-            const std::string player_level = "Level : " + std::to_string(level->get_level_num());                 
-            DrawText(player_level.c_str(), 10, 10, 20, DARKGRAY);                  
+        // Presenting player current level
+        const std::string player_level = "Level : " + std::to_string(level->get_level_num());
+        WindowManager::DisplayText(kLeft, player_level.c_str(), 10, 10, 20, DARKGRAY);
 
-            // Presenting offensive rate
-            const std::string offensive_rate = "Risk rate : " + std::to_string(ball->get_risk_rate());            
-            DrawText(offensive_rate.c_str(), SCREEN_WIDTH / 2 - 50, 10, 20, DARKGRAY);               
+        // Presenting offensive rate
+        const std::string offensive_rate = "Risk rate : " + std::to_string(ball->get_risk_rate());
+        WindowManager::DisplayText(kMiddle, offensive_rate.c_str(), -50, 10, 20, DARKGRAY);
 
-            // Presenting player's score
-            const std::string player_score = "Score : " + std::to_string(player->get_score());            
-            DrawText(player_score.c_str(), SCREEN_WIDTH - 140, 10, 20, DARKGRAY);  
+        // const std::string ball_speed = "Ball speed : (" + std::to_string(ball->get_speed().x) + ", " + std::to_string(ball->get_speed().y) + ")";
+        // WindowManager::DisplayText(kMiddle, ball_speed.c_str(), -50, 10, 20, DARKGRAY);
 
-            if (!is_key_space_down) {
-                DrawText("Press space bar to start.", SCREEN_WIDTH - 275, SCREEN_HEIGHT - 50 , 20, Fade(GRAY, 0.5f));
-            }
-        } else if (player->get_state() == out) {
-            ClearBackground(BACKGROUND_COLOR);   
+        // const std::string window_size = "Window size : (" + std::to_string(WindowManager::window_width()) + ", " + std::to_string(WindowManager::window_height()) + ")";
+        // WindowManager::DisplayText(kMiddle, window_size.c_str(), -50, 10, 20, DARKGRAY);
 
-            DrawText("Try again!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, RED);
-        } else if (player->get_state() == level_up) {
-            ClearBackground(BACKGROUND_COLOR);       
+        // const std::string window_scale = "Window scale : (" + std::to_string(WindowManager::scale().x) + ", " + std::to_string(WindowManager::scale().y) + ")";
+        // WindowManager::DisplayText(kMiddle, window_scale.c_str(), -50, 10, 20, DARKGRAY);
 
-            DrawText("Level up!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, BLACK);
-        } else if (player->get_state() == goodbye) {
-            ClearBackground(BACKGROUND_COLOR); 
+        // Presenting player's score
+        const std::string player_score = "Score : " + std::to_string(player->get_score());
+        WindowManager::DisplayText(kRight, player_score.c_str(), -140, 10, 20, DARKGRAY);
 
-            DrawText("Goodbye!", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 , 40, GRAY);
-
-            // Presenting player's high score
-            const std::string player_high_score = "High score : " + std::to_string(player->get_high_score());               
-            DrawText(player_high_score.c_str(), SCREEN_WIDTH/2 - 160, SCREEN_HEIGHT/2 - 10, 40, GRAY);            
+        if (!is_key_space_down)
+        {
+            WindowManager::DisplayText(kBottomRight, "Press space bar to start.", -275, -50, 20, Fade(GRAY, 0.5f));
         }
+    }
+    else if (player->get_state() == kOut)
+    {
+        ClearBackground(kBackgroundColor);
+
+        WindowManager::DisplayText(kCentre, "Try again!", -100, -100, 40, RED);
+    }
+    else if (player->get_state() == kLevelUp)
+    {
+        ClearBackground(kBackgroundColor);
+
+        WindowManager::DisplayText(kCentre, "Level up!", -100, -100, 40, BLACK);
+    }
+    else if (player->get_state() == kGoodbye)
+    {
+        ClearBackground(kBackgroundColor);
+
+        WindowManager::DisplayText(kCentre, "Goodbye!", -100, -100, 40, GRAY);
+
+        // Presenting player's high score
+        const std::string player_high_score = "High score : " + std::to_string(player->get_high_score());
+        WindowManager::DisplayText(kCentre, player_high_score.c_str(), -160, -10, 40, GRAY);
+    }
 
     EndDrawing();
     //----------------------------------------------------------------------------------
-}
-
-// Save integer value to storage file (to defined position)
-// NOTE: Storage positions is directly related to file memory layout (4 bytes each integer)
-bool SaveStorageValue(unsigned int position, int value)
-{
-    bool success = false;
-    unsigned int dataSize = 0;
-    unsigned int newDataSize = 0;
-    unsigned char *fileData = LoadFileData(STORAGE_DATA_FILE, &dataSize);
-    unsigned char *newFileData = NULL;
-
-    if (fileData != NULL)
-    {
-        if (dataSize <= (position*sizeof(int)))
-        {
-            // Increase data size up to position and store value
-            newDataSize = (position + 1)*sizeof(int);
-            newFileData = (unsigned char *)RL_REALLOC(fileData, newDataSize);
-
-            if (newFileData != NULL)
-            {
-                // RL_REALLOC succeded
-                int *dataPtr = (int *)newFileData;
-                dataPtr[position] = value;
-            }
-            else
-            {
-                // RL_REALLOC failed
-                TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to realloc data (%u), position in bytes (%u) bigger than actual file size", STORAGE_DATA_FILE, dataSize, position*sizeof(int));
-
-                // We store the old size of the file
-                newFileData = fileData;
-                newDataSize = dataSize;
-            }
-        }
-        else
-        {
-            // Store the old size of the file
-            newFileData = fileData;
-            newDataSize = dataSize;
-
-            // Replace value on selected position
-            int *dataPtr = (int *)newFileData;
-            dataPtr[position] = value;
-        }
-
-        success = SaveFileData(STORAGE_DATA_FILE, newFileData, newDataSize);
-        RL_FREE(newFileData);
-
-        TraceLog(LOG_INFO, "FILEIO: [%s] Saved storage value: %i", STORAGE_DATA_FILE, value);
-    }
-    else
-    {
-        TraceLog(LOG_INFO, "FILEIO: [%s] File created successfully", STORAGE_DATA_FILE);
-
-        dataSize = (position + 1)*sizeof(int);
-        fileData = (unsigned char *)RL_MALLOC(dataSize);
-        int *dataPtr = (int *)fileData;
-        dataPtr[position] = value;
-
-        success = SaveFileData(STORAGE_DATA_FILE, fileData, dataSize);
-        UnloadFileData(fileData);
-
-        TraceLog(LOG_INFO, "FILEIO: [%s] Saved storage value: %i", STORAGE_DATA_FILE, value);
-    }
-
-    return success;
-}
-
-// Load integer value from storage file (from defined position)
-// NOTE: If requested position could not be found, value 0 is returned
-int LoadStorageValue(unsigned int position)
-{
-    int value = 0;
-    unsigned int dataSize = 0;
-    unsigned char *fileData = LoadFileData(STORAGE_DATA_FILE, &dataSize);
-
-    if (fileData != NULL)
-    {
-        if (dataSize < (position*4)) TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to find storage position: %i", STORAGE_DATA_FILE, position);
-        else
-        {
-            int *dataPtr = (int *)fileData;
-            value = dataPtr[position];
-        }
-
-        UnloadFileData(fileData);
-
-        TraceLog(LOG_INFO, "FILEIO: [%s] Loaded storage value: %i", STORAGE_DATA_FILE, value);
-    }
-
-    return value;
 }

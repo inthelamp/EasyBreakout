@@ -8,24 +8,32 @@
 #ifndef STORAGE_VALUE_H_
 #define STORAGE_VALUE_H_
 
-// Storage definition
-#if defined(EMSCRIPTEN)  
-const char * STORAGE_DATA_FILE = "/data/storage.data";          
-#else    
-const char * STORAGE_DATA_FILE = "./resources/data/storage.data";    
-#endif   
+#include <iostream>
+
+#include "raylib.h"
 
 // NOTE: Storage positions must start with 0, directly related to file memory layout
-typedef enum {
-    STORAGE_POSITION_LEVEL          = 0,
-    STORAGE_POSITION_NUM_OF_BLOCKS  = 1,
-    STORAGE_POSITION_SCORE          = 2,
-    STORAGE_POSITION_HIGH_SCORE     = 3
-} StorageData;
+enum StorageData
+{
+    kStoragePositionLevel = 0,
+    kStoragePositionNumOfBlock = 1,
+    kStoragePositionScore = 2,
+    kStoragePositionHighScore = 3
+};
 
-// Persistent storage functions
-static bool SaveStorageValue(unsigned int position, int value);
-static int LoadStorageValue(unsigned int position);
+// Static class
+class StorageValue
+{
+public:
+    StorageValue() = delete;
 
+    static const char *storage_data_file();
 
+    // Persistent storage functions
+    static const bool SaveStorageValue(unsigned int position, int value);
+    static const int LoadStorageValue(unsigned int position);
+
+private:
+    static const char *kStorageDataFile;
+};
 #endif // STORAGE_VALUE_H_

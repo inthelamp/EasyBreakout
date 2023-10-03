@@ -6,7 +6,7 @@
  */
 
 #include "Player.h"
-#include "Level.h"
 
-Player :: Player(Level * level) : level(level), score(0) {
+Player::Player(Level *level) : level(level), score(0)
+{
 }

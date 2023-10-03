@@ -9,20 +9,18 @@
 #define CIRCLE_H_
 
 #include <utility>
-#include "raylib.h"
-#include "GraphicsEntity.h"
 
-class Circle : public GraphicsEntity {
+class Circle
+{
+public:
+	Circle(int radius) : radius(radius) {}
+	virtual ~Circle() {}
+
+	const int &get_radius() const { return radius; }
+	void set_radius(int radius) { this->radius = radius; }
+
 private:
 	int radius;
-
-public:
-	Circle(const Vector2& position, const int& radius) : GraphicsEntity(position) { this->radius = radius; }
-	virtual ~Circle() { }
-
-	const int& get_radius() const & { return radius; }
-	int get_radius() && { return std::move(radius); }
-	void set_radius(const int& radius) { this->radius = radius; }
 };
 
-#endif // CIRCLE_H_ 
+#endif // CIRCLE_H_

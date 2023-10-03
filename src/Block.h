@@ -8,61 +8,72 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
-#include <utility>
+#include <iostream>
+
 #include "raylib.h"
+
+#include "WindowManager.h"
 #include "MovingEntity.h"
 #include "RoundedRect.h"
 
 // Getting random color
-inline Color RandomColor() {
-	return (Color){ (unsigned char) GetRandomValue(0, 254), (unsigned char) GetRandomValue(0, 254), (unsigned char) GetRandomValue(0, 254), 0xff };
+inline Color random_color()
+{
+	return (Color){(unsigned char)GetRandomValue(0, 254), (unsigned char)GetRandomValue(0, 254), (unsigned char)GetRandomValue(0, 254), 0xff};
 }
 
 // Getting random points
-inline int RandomPoints() {
+inline int random_points()
+{
 	return GetRandomValue(50, 200);
 }
 
 // Getting complementary color
-inline constexpr Color ComplementaryColor (const Color& color)
+inline constexpr Color complementary_color(const Color &color)
 {
-    return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
+	return {static_cast<unsigned char>(255 - (int)color.r), static_cast<unsigned char>(255 - (int)color.g), static_cast<unsigned char>(255 - (int)color.b), 0xff};
 }
 
-class Block : public MovingEntity, public RoundedRect {
-private:
-	constexpr static float kBlockFallingSpeed = 5.0f;         // Block falling speed on y-axis
-	constexpr static float kBlockRoundness = 0.2f;
-	constexpr static float kBlockSegments = 0.0f;
-	
-	const Color color;
-	const int point;
+inline float block_roundness() { return 0.2f * WindowManager::scale().x; }
 
-	bool disabled = false; 
-	bool falling = false;
-	
+// Block falling speed on y-axis
+inline float block_falling_speed() { return 5.0f * WindowManager::scale().y; }
+
+class Block : public MovingEntity, public RoundedRect
+{
 public:
-	static int num_of_disabled_blocks;                        // Number of disabled blocks
-	constexpr static float kBlockWidth = 100.0f;
-	constexpr static float kBlockHeight = 30.0f;
-	constexpr static float kBlockRowOffset = 1.0f;
-	constexpr static float kBlockColumnOffset = 1.0f;
-
 	Block();
-	Block(const Color& color, const int& points, const Vector2& position);
-	virtual ~Block() { }
-	
-	const Color& get_color() const & { return color; }
-	Color get_color() && { return std::move(color); }
-	const int& get_point() const { return point; }
+	Block(const Color &color, int points, const Vector2 &position);
+	virtual ~Block() {}
 
-	const bool is_disabled() const { return disabled; }
-	const bool is_falling() const { return falling; }
+	const static float block_width() { return kBlockWidth * WindowManager::scale().x; }
+	const static float block_height() { return kBlockHeight * WindowManager::scale().y; }
+
+	const Color &get_color() const & { return color; }
+	Color get_color() && { return std::move(color); }
+	int get_point() { return point; }
+	bool is_disabled() { return disabled; }
+	bool is_falling() { return falling; }
 	void set_disabled() { disabled = true; }
 	void set_falling() { falling = true; }
 
 	void Move() override;
-    void Draw() override;
+	void Draw() override;
+
+private:
+	constexpr static float kBlockWidth = 100.0f;
+	constexpr static float kBlockHeight = 30.0f;
+	constexpr static float kBlockSegments = 0.0f;
+
+	Color color;
+	int point;
+	bool disabled = false;
+	bool falling = false;
+
+	static Rectangle rectangle(const Vector2 &position)
+	{
+		return (Rectangle){position.x * WindowManager::scale().x, position.y * WindowManager::scale().y, kBlockWidth, kBlockHeight};
+	}
 };
 
-#endif // BLOCK_H 
+#endif // BLOCK_H

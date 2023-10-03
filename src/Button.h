@@ -8,67 +8,66 @@
 #ifndef BUTTON_H_
 #define BUTTON_H_
 
-#include "EasyBreakout.h"
+#include "raylib.h"
+
+#include "WindowManager.h"
 #include "GraphicsEntity.h"
 
-enum button_state_t { normal, mouse_hover, pressed };
+enum ButtonState
+{
+    kNormal,
+    kMouseHover,
+    kPressed
+};
 
-class Button : public GraphicsEntity {
-private:
-    const Texture2D * button = nullptr;
-    const Sound * sound = nullptr;
-    button_state_t state = normal;
-    bool activated = false;
-    Rectangle source_rectangle;
-
-    const float frame_height() {
-        return (float)button->height / kNumberOfFrames;
-    } 
-
-    const Rectangle btn_bounds() { 
-        return (Rectangle){ this->get_position().x, this->get_position().y, (float)button->width, frame_height() };
-    }   
-
+class Button : public GraphicsEntity<Rectangle>
+{
 public:
+    Button(const Texture2D *button, const float &pos_x);
+    Button(const Texture2D *button, const Sound *sound, const float &pos_x);
+    Button(const Texture2D *button, const Sound *sound, const Rectangle &source_rec, const Vector2 &position);
+    virtual ~Button() {}
+
+    const ButtonState &get_state() const & { return state; }
+    ButtonState get_state() && { return std::move(state); }
+    bool is_activated() { return activated; }
+
+    void set_state(const ButtonState &state) { this->state = state; }
+    void set_activated(bool activated) { this->activated = activated; }
+
+    void check_click(const Vector2 &mouse_point);
+
+    Rectangle Scale(Rectangle &&shape) override;
+    void Draw() override;
+
+private:
     constexpr static int kNumberOfFrames = 3;
 
-	Button(const Texture2D * button) 
-        : GraphicsEntity((Vector2){SCREEN_WIDTH/2.0f - button->width/2.0f, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
-        button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }
-	Button(const Texture2D * button, const float& pos_x) 
-        : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
-        button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }	
-    Button(const Texture2D * button, const Sound * sound, const float& pos_x) 
-        : GraphicsEntity((Vector2){pos_x, SCREEN_HEIGHT/2.0f - button->height/kNumberOfFrames/2.0f}), 
-        sound(sound), button(button), source_rectangle((Rectangle){ 0, 0, (float)button->width, frame_height() }) { }        
-    Button(const Texture2D * button, const Sound * sound, const Rectangle& source_rec, const Vector2& position) 
-        : GraphicsEntity(position), sound(sound), button(button), source_rectangle(source_rec) { }
-	virtual ~Button() { }
+    const Texture2D *button = nullptr;
+    const Sound *sound = nullptr;
+    Rectangle source_rectangle;
 
-    const button_state_t& get_state() const & { return state; }
-    button_state_t get_state() && { return std::move(state); }    
-    const bool get_activated() const { return activated; } 
+    ButtonState state = kNormal;
+    bool activated = false;
 
-    void set_state(const button_state_t& state) { this->state = state; }
-    void set_activated(const bool& activated) { this->activated = activated; }
-
-    void check_click(const Vector2& mouse_point) {
-        if (CheckCollisionPointRec(mouse_point, btn_bounds())) {
-            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) state = pressed;
-            else state = mouse_hover;
-            
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) activated = true;
-        } else state = normal;
-
-        if (activated && sound) PlaySound(*sound);
-
-        // Calculate button frame rectangle to draw depending on button state
-        source_rectangle.y = state * frame_height();     
+    static float frame_height(const Texture2D *button)
+    {
+        return (float)button->height / kNumberOfFrames;
     }
 
-    void Draw() override {
-        const Rectangle bounds = btn_bounds();
-        DrawTextureRec(*button, source_rectangle, (Vector2){ bounds.x, bounds.y }, WHITE); // Draw button frame
+    static Rectangle rectangle(const float &width, const float &height, const float &pos_x)
+    {
+        return (Rectangle){WindowManager::window_width() / 2 + pos_x * WindowManager::scale().x, WindowManager::window_height() / 2 - height / 2, width, height};
+    }
+
+    static Rectangle rectangle(const float &width, const float &height, const Vector2 &position)
+    {
+        return (Rectangle){position.x, position.y, width, height};
+    }
+
+    static Vector2 position(const float &height, const float &pos_x)
+    {
+        return (Vector2){WindowManager::window_width() / 2 + pos_x * WindowManager::scale().x, WindowManager::window_height() / 2 - height / 2};
     }
 };
 
