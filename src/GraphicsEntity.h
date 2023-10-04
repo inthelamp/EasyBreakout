@@ -29,13 +29,13 @@ public:
 	void set_shape(T &&shape) { this->shape = std::move(shape); }
 
 	const Vector2 &get_position() const { return position; }
-	const float &get_position_x() const { return position.x; }
+	float get_position_x() { return position.x; }
 	void set_position(const Vector2 &position);
 	void set_position(Vector2 &&position);
-	void set_position_x(float &&x);
-	void set_position_y(float &&y);
+	void set_position_x(float x);
+	void set_position_y(float y);
 
-	virtual T Scale(T &&shape) = 0; // Adjust game object
+	virtual T Scale(T &&shape) = 0; // Adjust scale of game object
 	virtual void Draw() = 0;		// Display game object
 
 private:

@@ -37,6 +37,7 @@ public:
 	constexpr static int kWindowMinWidth = 480;	 // Minimum window width
 	constexpr static int kWindowMinHeight = 270; // Minimum window height
 
+// For Webassembly
 #if defined(EMSCRIPTEN)
 	static const Vector2 scale() { return (Vector2){kWindowWidth / 960.0f, kWindowHeight / 540.0f}; }
 #else
@@ -47,7 +48,7 @@ public:
 	static void DisplayText(const DisplayArea &display_area, const char *text, int pos_x, int pos_y, int font_size, const Color &color);
 
 private:
-	// Size rate against screen size 950 x 540
+	// Size rate against window size 950 x 540
 #if !defined(EMSCRIPTEN)
 	static const Vector2 kScale;
 #endif

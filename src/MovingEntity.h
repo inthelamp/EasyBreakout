@@ -24,8 +24,7 @@ public:
 
 	const Vector2 &get_speed() const & { return speed; }
 	Vector2 get_speed() && { return std::move(speed); }
-	const float &get_speed_x() const & { return speed.x; }
-	float get_speed_x() && { return std::move(speed.x); }
+	float get_speed_x() { return speed.x; }
 	void set_speed(const Vector2 &speed) { this->speed = speed; }
 	void set_speed(Vector2 &&speed) { this->speed = std::move(speed); }
 

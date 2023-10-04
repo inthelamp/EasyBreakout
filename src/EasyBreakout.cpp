@@ -75,10 +75,10 @@ int main(void)
 #endif
 
     const Texture2D play_button_texture = LoadTexture(play_button_texture_file_name);
-    play_button = new Button(&play_button_texture, &button_sound, -130);
+    play_button = new Button(play_button_texture, &button_sound, -130);
 
     const Texture2D end_button_texture = LoadTexture(end_button_texture_file_name);
-    end_button = new Button(&end_button_texture, &button_sound, 10);
+    end_button = new Button(end_button_texture, &button_sound, 10);
 
     // Loading game objects
     //----------------------------------------------------------------------------------

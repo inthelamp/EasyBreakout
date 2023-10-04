@@ -8,7 +8,7 @@
 #include "Ball.h"
 
 // Initializing ball
-Ball::Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, const float &pos_y, const Vector2 &speed) : MovingEntity(speed), GraphicsEntity<Circle>(circle(), position(pos_y)), hit_bar_sound(hit_bar_sound), hit_block_sound(hit_block_sound), color(color)
+Ball::Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, float pos_y, const Vector2 &speed) : MovingEntity(speed), GraphicsEntity<Circle>(circle(), position(pos_y)), hit_bar_sound(hit_bar_sound), hit_block_sound(hit_block_sound), color(color)
 {
 	auto shape = get_shape();
 	set_shape(Scale(std::move(shape)));

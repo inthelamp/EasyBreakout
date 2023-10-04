@@ -33,7 +33,7 @@ inline float random_speed_rate_x()
 class Ball final : public MovingEntity, public GraphicsEntity<Circle>
 {
 public:
-	Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, const float &pos_y, const Vector2 &speed);
+	Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, float pos_y, const Vector2 &speed);
 
 	bool is_held() { return held; }
 	bool is_enabled() { return enabled; }
@@ -43,7 +43,7 @@ public:
 	void set_held(bool held) { this->held = held; }
 	void set_enabled(bool enabled) { this->enabled = enabled; }
 
-	void set_default_position(const float &pos_y) { set_position((Vector2){(float)WindowManager::window_width() / 2, pos_y - get_shape().get_radius()}); }
+	void set_default_position(float pos_y) { set_position((Vector2){(float)WindowManager::window_width() / 2, pos_y - get_shape().get_radius()}); }
 
 	bool IsCollided(const Rectangle &rec);					  // Checking collision with rectangle
 	void Collide(const Rectangle &rec, const Vector2 &speed); // Colliding with rectangle
@@ -73,7 +73,7 @@ private:
 		return std::move(Circle(kRadius));
 	}
 
-	static Vector2 position(const float &pos_y)
+	static Vector2 position(float pos_y)
 	{
 		return (Vector2){WindowManager::window_width() / 2.0f - kRadius * WindowManager::scale().x, pos_y - kRadius * WindowManager::scale().x};
 	}

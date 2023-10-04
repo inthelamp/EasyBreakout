@@ -26,18 +26,17 @@ enum PlayerState
 class Player
 {
 public:
-    Player(Level *level);
+    Player(const Level *level);
     virtual ~Player() {}
 
-    Level *get_level() { return level; }
-    void set_level(Level *level) { this->level = level; }
-    const unsigned int &get_score() const { return score; }
-    void set_score(const unsigned int &score) { this->score = score; }
-    const unsigned int &get_high_score() const { return high_score; }
-    void set_high_score(const unsigned int &high_score) { this->high_score = high_score; }
-    const PlayerState &get_state() const & { return state; }
-    PlayerState get_state() && { return std::move(state); }
-    void set_state(const PlayerState &state) { this->state = state; }
+    const Level *get_level() const { return level; }
+    void set_level(const Level *level) { this->level = level; }
+    unsigned int get_score() { return score; }
+    void set_score(unsigned int score) { this->score = score; }
+    unsigned int get_high_score() { return high_score; }
+    void set_high_score(unsigned int high_score) { this->high_score = high_score; }
+    PlayerState get_state() { return state; }
+    void set_state(PlayerState state) { this->state = state; }
 
     void AddScore(int points)
     {
@@ -45,7 +44,7 @@ public:
     }
 
 private:
-    Level *level;                // Game level
+    const Level *level;          // Game level
     unsigned int score = 0;      // Game score
     unsigned int high_score = 0; // High game score
     PlayerState state = kIntro;  // Player status

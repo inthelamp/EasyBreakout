@@ -52,27 +52,27 @@ void GraphicsEntity<Circle>::set_position(Vector2 &&position)
 }
 
 template <>
-void GraphicsEntity<Rectangle>::set_position_x(float &&x)
+void GraphicsEntity<Rectangle>::set_position_x(float x)
 {
     shape.x = x;
-    position.x = std::move(x);
+    position.x = x;
 }
 
 template <>
-void GraphicsEntity<Circle>::set_position_x(float &&x)
+void GraphicsEntity<Circle>::set_position_x(float x)
 {
-    position.x = std::move(x);
+    position.x = x;
 }
 
 template <>
-void GraphicsEntity<Rectangle>::set_position_y(float &&y)
+void GraphicsEntity<Rectangle>::set_position_y(float y)
 {
     shape.y = y;
-    position.y = std::move(y);
+    position.y = y;
 }
 
 template <>
-void GraphicsEntity<Circle>::set_position_y(float &&y)
+void GraphicsEntity<Circle>::set_position_y(float y)
 {
-    position.y = std::move(y);
+    position.y = y;
 }

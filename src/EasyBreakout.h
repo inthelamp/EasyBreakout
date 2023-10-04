@@ -8,10 +8,12 @@
 #ifndef EASY_BREAKOUT_
 #define EASY_BREAKOUT_
 
-// #define PLATFORM_WEB
+// For WebAssembly
 #if defined(EMSCRIPTEN)
 #include <emscripten/emscripten.h>
 #endif
+
+#include <memory>
 
 #include "raylib.h"
 
