@@ -46,8 +46,8 @@ public:
 	Block(const Color &color, int points, const Vector2 &position);
 	virtual ~Block() {}
 
-	const static float block_width() { return kBlockWidth * WindowManager::scale().x; }
-	const static float block_height() { return kBlockHeight * WindowManager::scale().y; }
+	const static float block_width() { return kBlockSize.width * WindowManager::scale().x; }
+	const static float block_height() { return kBlockSize.height * WindowManager::scale().y; }
 
 	const Color &get_color() const & { return color; }
 	Color get_color() && { return std::move(color); }
@@ -61,8 +61,7 @@ public:
 	void Draw() override;
 
 private:
-	constexpr static float kBlockWidth = 100.0f;
-	constexpr static float kBlockHeight = 30.0f;
+	constexpr static Size kBlockSize = (Size){100, 30};
 	constexpr static float kBlockSegments = 0.0f;
 
 	Color color;
@@ -72,7 +71,7 @@ private:
 
 	static Rectangle rectangle(const Vector2 &position)
 	{
-		return (Rectangle){position.x * WindowManager::scale().x, position.y * WindowManager::scale().y, kBlockWidth, kBlockHeight};
+		return (Rectangle){position.x * WindowManager::scale().x, position.y * WindowManager::scale().y, kBlockSize.width, kBlockSize.height};
 	}
 };
 

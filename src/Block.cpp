@@ -7,7 +7,7 @@
 
 #include "Block.h"
 
-Block::Block() : MovingEntity({0.0f, block_falling_speed()}), RoundedRect((Rectangle){0.0f, 0.0f, kBlockWidth, kBlockHeight}, block_roundness(), kBlockSegments), color(random_color()), point(random_points())
+Block::Block() : MovingEntity({0.0f, block_falling_speed()}), RoundedRect((Rectangle){0.0f, 0.0f, kBlockSize.width, kBlockSize.height}, block_roundness(), kBlockSegments), color(random_color()), point(random_points())
 {
 }
 
@@ -31,7 +31,7 @@ void Block::Move()
 {
 	auto position = get_position();
 
-	if (position.y < WindowManager::window_height())
+	if (position.y < WindowManager::window_size().height)
 	{
 		position.y += block_falling_speed();
 		set_position(position);

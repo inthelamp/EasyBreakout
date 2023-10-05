@@ -38,7 +38,7 @@ int main(void)
     // Initializing window
     //----------------------------------------------------------------------------------
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT); // Make the window resizable
-    InitWindow(WindowManager::window_width(), WindowManager::window_height(), "EasyBreakout");
+    InitWindow(WindowManager::window_size().width, WindowManager::window_size().height, "EasyBreakout");
     SetWindowMinSize(WindowManager::kWindowMinWidth, WindowManager::kWindowMinHeight);
 
     // Initializing game sound

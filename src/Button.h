@@ -54,7 +54,7 @@ private:
 
     static Rectangle rectangle(float width, float height, float pos_x)
     {
-        return (Rectangle){WindowManager::window_width() / 2 + pos_x * WindowManager::scale().x, WindowManager::window_height() / 2 - height / 2, width, height};
+        return (Rectangle){WindowManager::window_size().width / 2 + pos_x * WindowManager::scale().x, WindowManager::window_size().height / 2 - height / 2, width, height};
     }
 
     static Rectangle rectangle(float width, float height, const Vector2 &position)
@@ -64,7 +64,7 @@ private:
 
     static Vector2 position(float height, float pos_x)
     {
-        return (Vector2){WindowManager::window_width() / 2 + pos_x * WindowManager::scale().x, WindowManager::window_height() / 2 - height / 2};
+        return (Vector2){WindowManager::window_size().width / 2 + pos_x * WindowManager::scale().x, WindowManager::window_size().height / 2 - height / 2};
     }
 };
 

@@ -18,7 +18,7 @@ void PlayingBar::Move()
 {
 	auto pos_x = get_position_x();
 
-	if (IsKeyDown(KEY_RIGHT) && (pos_x < (WindowManager::window_width() - kPlayingBarWidth * WindowManager::scale().x)))
+	if (IsKeyDown(KEY_RIGHT) && (pos_x < (WindowManager::window_size().width - kPlayingBarSize.width * WindowManager::scale().x)))
 	{
 		pos_x += get_speed_x();
 		set_position_x(std::move(pos_x));

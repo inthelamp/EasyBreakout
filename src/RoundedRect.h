@@ -33,7 +33,7 @@ private:
 
 	static Vector2 position(const Rectangle &rec, float pos_y)
 	{
-		return (Vector2){WindowManager::window_width() / 2 - rec.width / 2, pos_y};
+		return (Vector2){WindowManager::window_size().width / 2 - rec.width / 2, pos_y};
 	}
 };
 

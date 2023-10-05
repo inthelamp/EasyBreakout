@@ -28,6 +28,13 @@ enum DisplayArea
 	kAnywhere
 };
 
+// Vector2, 2 components
+typedef struct Size
+{
+	int width;	// Vector x component
+	int height; // Vector y component
+} Size;
+
 // Static class
 class WindowManager
 {
@@ -36,19 +43,32 @@ public:
 
 	constexpr static int kWindowMinWidth = 480;	 // Minimum window width
 	constexpr static int kWindowMinHeight = 270; // Minimum window height
+	constexpr static int kWindowMaxWidth = 960;	 // Minimum window width
+	constexpr static int kWindowMaxHeight = 540; // Minimum window height
 
 // For Webassembly
 #if defined(EMSCRIPTEN)
+	static const Size web_window_size()
+	{
+		int width, height;
+		emscripten_get_screen_size(&width, &height);
+		width *= 0.9;
+		height *= 0.9;
+		width = width < kWindowMinWidth ? kWindowMinWidth : width;
+		width = width > kWindowMaxWidth ? kWindowMaxWidth : width;
+		height = height < kWindowMinHeight ? kWindowMinHeight : height;
+		height = height > kWindowMaxHeight ? kWindowMaxHeight : height;
+		return (Size){width, height};
+	}
 	static const Vector2 scale() { return (Vector2){kWindowWidth / 960.0f, kWindowHeight / 540.0f}; }
 #else
 	static const Vector2 scale() { return kScale; }
 #endif
-	static const int window_width() { return kWindowWidth; }
-	static const int window_height() { return kWindowHeight; }
+	static const Size window_size() { return (Size){kWindowWidth, kWindowHeight}; }
 	static void DisplayText(const DisplayArea &display_area, const char *text, int pos_x, int pos_y, int font_size, const Color &color);
 
 private:
-	// Size rate against window size 950 x 540
+	// Size rate against window size 960 x 540
 #if !defined(EMSCRIPTEN)
 	static const Vector2 kScale;
 #endif

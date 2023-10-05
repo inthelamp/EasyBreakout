@@ -52,7 +52,7 @@ private:
     Vector2 first_row_start_position; // Position on x-axis where the first row of blocks starts
     Block *blocks;
 
-    int max_num_of_blocks_in_row() { return (int)(WindowManager::window_width() / (Block::block_width() + column_offset())); }
+    int max_num_of_blocks_in_row() { return (int)(WindowManager::window_size().width / (Block::block_width() + column_offset())); }
 };
 
 #endif // LEVEL_H_

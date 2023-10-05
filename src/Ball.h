@@ -43,7 +43,7 @@ public:
 	void set_held(bool held) { this->held = held; }
 	void set_enabled(bool enabled) { this->enabled = enabled; }
 
-	void set_default_position(float pos_y) { set_position((Vector2){(float)WindowManager::window_width() / 2, pos_y - get_shape().get_radius()}); }
+	void set_default_position(float pos_y) { set_position((Vector2){(float)WindowManager::window_size().width / 2, pos_y - get_shape().get_radius()}); }
 
 	bool IsCollided(const Rectangle &rec);					  // Checking collision with rectangle
 	void Collide(const Rectangle &rec, const Vector2 &speed); // Colliding with rectangle
@@ -75,7 +75,7 @@ private:
 
 	static Vector2 position(float pos_y)
 	{
-		return (Vector2){WindowManager::window_width() / 2.0f - kRadius * WindowManager::scale().x, pos_y - kRadius * WindowManager::scale().x};
+		return (Vector2){WindowManager::window_size().width / 2.0f - kRadius * WindowManager::scale().x, pos_y - kRadius * WindowManager::scale().x};
 	}
 
 	// Angle of bouncing ball depends on the speed on x-axis, so getting its random speed

@@ -21,11 +21,11 @@ Level::Level(int level_num, int number_of_blocks, const Color &background_color)
     float pos_x;
     if (number_of_blocks >= max_num_of_blocks_in_row())
     {
-        pos_x = (WindowManager::window_width() - (Block::block_width() + column_offset()) * max_num_of_blocks_in_row()) / 2;
+        pos_x = (WindowManager::window_size().width - (Block::block_width() + column_offset()) * max_num_of_blocks_in_row()) / 2;
     }
     else
     {
-        pos_x = (WindowManager::window_width() - (Block::block_width() + column_offset()) * number_of_blocks) / 2;
+        pos_x = (WindowManager::window_size().width - (Block::block_width() + column_offset()) * number_of_blocks) / 2;
     }
     first_row_start_position = (Vector2){pos_x, kFirstRowStartPosY};
 
@@ -37,14 +37,15 @@ Level::Level(int level_num, int number_of_blocks, const Color &background_color)
         throw("Memory allocation failure!!");
     }
 
-    // #if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN)
     //     std::cout << "Scale " << WindowManager::scale().x << ", " << WindowManager::scale().y << std::endl;
     //     std::cout << "ball_inital_speed_x, ball_inital_speed_y: " << ball_inital_speed_x() << ", " << ball_inital_speed_y() << std::endl;
     //     std::cout << "ball speed: " << ball_speed.x << ", " << ball_speed.y << std::endl;
     //     std::cout << "column_offset(), row_offset(): " << column_offset() << ", " << row_offset() << std::endl;
     //     std::cout << "level_num, number_of_blocks: " << level_num << ", " << number_of_blocks << std::endl;
     //     std::cout << "num_of_disabled_blocks: " << num_of_disabled_blocks << std::endl;
-    // #endif
+    std::cout << "Window width, Window height: " << WindowManager::web_window_size().width << ", " << WindowManager::web_window_size().height << std::endl;
+#endif
 }
 
 Level::Level(int level_num, int number_of_blocks, const Vector2 &ball_speed, const Color &background_color) : level_num(level_num), number_of_blocks(number_of_blocks), ball_speed(ball_speed), background_color(background_color)
@@ -54,11 +55,11 @@ Level::Level(int level_num, int number_of_blocks, const Vector2 &ball_speed, con
     float pos_x;
     if (number_of_blocks >= max_num_of_blocks_in_row())
     {
-        pos_x = (WindowManager::window_width() - (Block::block_width() + column_offset()) * max_num_of_blocks_in_row()) / 2;
+        pos_x = (WindowManager::window_size().width - (Block::block_width() + column_offset()) * max_num_of_blocks_in_row()) / 2;
     }
     else
     {
-        pos_x = (WindowManager::window_width() - (Block::block_width() + column_offset()) * number_of_blocks) / 2;
+        pos_x = (WindowManager::window_size().width - (Block::block_width() + column_offset()) * number_of_blocks) / 2;
     }
     first_row_start_position = (Vector2){pos_x, kFirstRowStartPosY};
 
@@ -101,7 +102,7 @@ void Level::Draw()
     else
     { // More than one row
         const int number_of_remain_blocks = number_of_blocks - max_num_of_rows_with_full_columns * max_num_of_blocks_in_row();
-        const float last_row_start_pos_x = (WindowManager::window_width() - (Block::block_width() + column_offset()) * number_of_remain_blocks) / 2;
+        const float last_row_start_pos_x = (WindowManager::window_size().width - (Block::block_width() + column_offset()) * number_of_remain_blocks) / 2;
         int current_row_num = 0; // Starting with 0
 
         for (int i = 0; i < number_of_blocks; ++i)
@@ -143,7 +144,7 @@ void Level::Fall()
         if (blocks[i].is_falling() && !blocks[i].is_disabled())
         {
             blocks[i].Move();
-            if (blocks[i].get_position().y >= WindowManager::window_height())
+            if (blocks[i].get_position().y >= WindowManager::window_size().height)
             {
                 blocks[i].set_disabled();
                 ++num_of_disabled_blocks;

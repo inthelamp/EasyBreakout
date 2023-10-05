@@ -26,7 +26,7 @@ void Ball::Move()
 	position.x += get_speed().x;
 	position.y += get_speed().y;
 
-	if (position.x >= (WindowManager::window_width() - get_shape().get_radius()) || (position.x <= get_shape().get_radius()))
+	if (position.x >= (WindowManager::window_size().width - get_shape().get_radius()) || (position.x <= get_shape().get_radius()))
 	{
 		auto speed = get_speed();
 		set_speed((Vector2){speed.x * -1.0f, speed.y});
@@ -34,7 +34,7 @@ void Ball::Move()
 			enabled = true; // It is enabled when it hits walls
 	}
 
-	if (position.y >= (WindowManager::window_height() - get_shape().get_radius()) || (position.y <= get_shape().get_radius()))
+	if (position.y >= (WindowManager::window_size().height - get_shape().get_radius()) || (position.y <= get_shape().get_radius()))
 	{
 		auto speed = get_speed();
 		set_speed((Vector2){speed.x, speed.y * -1.0f});
@@ -52,7 +52,7 @@ void Ball::Move()
 				++risk_rate;
 			}
 		}
-		else if (position.y >= (WindowManager::window_height() - get_shape().get_radius()))
+		else if (position.y >= (WindowManager::window_size().height - get_shape().get_radius()))
 		{
 			++risk_rate;
 		}
