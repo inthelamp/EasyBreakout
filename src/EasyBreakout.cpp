@@ -8,6 +8,7 @@
 #include "EasyBreakout.h"
 
 // Define global variables
+HUD *hud = nullptr;
 Level *level = nullptr;
 Player *player = nullptr;
 PlayingBar *playingBar = nullptr;
@@ -16,7 +17,6 @@ Button *play_button = nullptr;
 Button *end_button = nullptr;
 Vector2 mouse_point = {0.0f, 0.0f};
 bool exit_window = false;
-bool is_key_space_down = false;
 
 //----------------------------------------------------------------------------------
 // Module functions declaration
@@ -63,6 +63,12 @@ int main(void)
     // background_sound.looping = true;
     // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
     // PlayMusicStream(background_sound);
+
+    // Initialize HUD
+    if (WindowManager::IsMobile())
+    {
+        hud = new HUD();
+    }
 
     // Loading buttons
 
@@ -129,6 +135,11 @@ int main(void)
 
     // Deleting dynamic storages
     //-------------------------------------------------------------------------------------
+    if (WindowManager::IsMobile())
+    {
+        delete hud;
+    }
+
     delete ball;
     delete playingBar;
     delete level;
@@ -183,17 +194,39 @@ void UpdateDrawFrame()
             player->set_state(kIntro);
 
         // Moving playing bat
-        playingBar->Move();
+        if (WindowManager::IsMobile())
+        {
+            hud->set_last_gesture(hud->current_gesture());
+            hud->set_current_gesture(GetGestureDetected());
+            if (hud->current_gesture() != hud->last_gesture() && (hud->current_gesture() == GESTURE_TAP || hud->current_gesture() == GESTURE_HOLD))
+            {
+                playingBar->Move(*hud);
+            }
+        }
+        else
+        {
+            playingBar->Move();
+        }
+
+        // Start playing game by pressing space bar or touching upper part of screen for a mobile device
+        if (WindowManager::IsMobile())
+        {
+            if (ball->is_held() && playingBar->IsPlayingBarTouched())
+            {
+                ball->set_held(false);
+            }
+        }
+        else
+        {
+            if (ball->is_held() && IsKeyDown(KEY_SPACE))
+            {
+                ball->set_held(false);
+            }
+        }
 
         const Rectangle play_bar_shape = playingBar->get_shape();
 
         // Bouncing ball logic
-        if (ball->is_held() && IsKeyDown(KEY_SPACE))
-        {
-            ball->set_held(false);
-            is_key_space_down = true;
-        }
-
         if (!ball->is_held())
         {
             ball->Move();
@@ -240,7 +273,7 @@ void UpdateDrawFrame()
     }
     else if (player->get_state() == kOut)
     { // Failed, try the same level again
-        is_key_space_down = false;
+        ball->set_held(true);
 
         const int level_num = level->get_level_num();
         const int num_of_blocks = level->get_number_of_blocks();
@@ -272,7 +305,7 @@ void UpdateDrawFrame()
     }
     else if (player->get_state() == kLevelUp)
     {
-        is_key_space_down = false;
+        ball->set_held(true);
 
         // Save player's data
         int level_num = level->get_level_num();
@@ -343,6 +376,12 @@ void UpdateDrawFrame()
     { // Playing game
         ClearBackground(level->get_background_color());
 
+        // Draw HUD
+        if (WindowManager::IsMobile())
+        {
+            hud->Draw();
+        }
+
         level->Draw();
         playingBar->Draw();
         ball->Draw();
@@ -368,9 +407,19 @@ void UpdateDrawFrame()
         const std::string player_score = "Score : " + std::to_string(player->get_score());
         WindowManager::DisplayText(kRight, player_score.c_str(), -140, 10, 20, DARKGRAY);
 
-        if (!is_key_space_down)
+        if (WindowManager::IsMobile())
         {
-            WindowManager::DisplayText(kBottomRight, "Press space bar to start.", -275, -50, 20, Fade(GRAY, 0.5f));
+            if (ball->is_held())
+            {
+                WindowManager::DisplayText(kBottomRight, "Touch bar under ball to start.", -350, -50, 20, Fade(GRAY, 0.5f));
+            }
+        }
+        else
+        {
+            if (ball->is_held())
+            {
+                WindowManager::DisplayText(kBottomRight, "Press space bar to start.", -275, -50, 20, Fade(GRAY, 0.5f));
+            }
         }
     }
     else if (player->get_state() == kOut)

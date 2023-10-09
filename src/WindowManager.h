@@ -52,8 +52,17 @@ public:
 	{
 		int width, height;
 		emscripten_get_screen_size(&width, &height);
-		width *= 0.9;
-		height *= 0.9;
+
+		if (width < height)
+		{
+			const int temp = width;
+			width = height;
+			height = temp;
+		}
+
+		height = width / 1.78;
+		width *= 0.8;
+		height *= 0.8;
 		width = width < kWindowMinWidth ? kWindowMinWidth : width;
 		width = width > kWindowMaxWidth ? kWindowMaxWidth : width;
 		height = height < kWindowMinHeight ? kWindowMinHeight : height;
@@ -65,6 +74,7 @@ public:
 	static const Vector2 scale() { return kScale; }
 #endif
 	static const Size window_size() { return (Size){kWindowWidth, kWindowHeight}; }
+	static const bool IsMobile() { return kWindowWidth < 640 ? true : false; }
 	static void DisplayText(const DisplayArea &display_area, const char *text, int pos_x, int pos_y, int font_size, const Color &color);
 
 private:

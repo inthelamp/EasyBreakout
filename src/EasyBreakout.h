@@ -19,6 +19,7 @@
 
 #include "WindowManager.h"
 #include "MovingEntity.h"
+#include "HUD.h"
 #include "Button.h"
 #include "Level.h"
 #include "Block.h"

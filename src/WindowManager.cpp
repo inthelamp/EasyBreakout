@@ -9,18 +9,6 @@
 
 // Screen size
 #if defined(EMSCRIPTEN)
-// EM_JS(int, browser_get_width, (), {
-// 	const {width, height} = canvas.getBoundingClientRect();
-// 	return width;
-// });
-
-// EM_JS(int, browser_get_height, (), {
-// 	const {width, height} = canvas.getBoundingClientRect();
-// 	return height;
-// });
-
-// const int WindowManager::kWindowWidth = browser_get_width() > WindowManager::kWindowMinWidth ? browser_get_width() : WindowManager::kWindowMinWidth;	  // Window width
-// const int WindowManager::kWindowHeight = browser_get_height() > WindowManager::kWindowMinHeight ? browser_get_height() : WindowManager::kWindowMinHeight; // Window height
 const int WindowManager::kWindowWidth = WindowManager::web_window_size().width;
 const int WindowManager::kWindowHeight = WindowManager::web_window_size().height;
 #else

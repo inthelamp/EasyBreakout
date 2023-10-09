@@ -4,6 +4,9 @@ Breakout game, an arcade video game, and so easy to play
 > Screenshot of Easy Breakout
 ![alt text](https://github.com/inthelamp/EasyBreakout/blob/master/EasyBreakout.png?raw=true "Easy Breakout")
 
+> Screenshot of Easy Breakout for mobile
+![alt text](https://github.com/inthelamp/EasyBreakout/blob/master/EasyBreakoutMobile.png?raw=true "Easy Breakout for Mobile")
+
 ### Windows version
 Use the following to build Windows version of the game
 

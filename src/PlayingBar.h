@@ -13,6 +13,7 @@
 #include "WindowManager.h"
 #include "MovingEntity.h"
 #include "RoundedRect.h"
+#include "HUD.h"
 
 class PlayingBar final : public MovingEntity, public RoundedRect
 {
@@ -22,7 +23,9 @@ public:
 	void set_speed(int level_num);
 	void set_default_position() { set_position((Vector2){(float)WindowManager::window_size().width / 2 - (kPlayingBarSize.width * WindowManager::scale().x) / 2, WindowManager::window_size().height - 50 * WindowManager::scale().y}); }
 
+	bool IsPlayingBarTouched();
 	void Move() override;
+	void Move(const HUD &hud); // For mobile
 	void Draw() override;
 
 private:
