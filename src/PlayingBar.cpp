@@ -42,13 +42,13 @@ void PlayingBar::Move(const HUD &hud)
 {
 	auto pos_x = get_position_x();
 
-	if (hud.IsTouchPointTouched(hud.left_touch_point()) && pos_x > 0.0f)
+	if (hud.IsControlPointTouched(hud.left_control()) && pos_x > 0.0f)
 	{
 		pos_x -= get_speed_x();
 		set_position_x(pos_x);
 	}
 
-	if (hud.IsTouchPointTouched(hud.right_touch_point()) && pos_x < (WindowManager::window_size().width - kPlayingBarSize.width * WindowManager::scale().x))
+	if (hud.IsControlPointTouched(hud.right_control()) && pos_x < (WindowManager::window_size().width - kPlayingBarSize.width * WindowManager::scale().x))
 	{
 		pos_x += get_speed_x();
 		set_position_x(pos_x);

@@ -16,6 +16,7 @@
 #include "WindowManager.h"
 #include "MovingEntity.h"
 #include "GraphicsEntity.h"
+#include "HUD.h"
 #include "Circle.h"
 #include "Block.h"
 
@@ -50,8 +51,12 @@ public:
 
 	// Checking collision with blocks and returning the block number hit, otherwise returning -1
 	int CollidedBlock(Block *blocks, int number_of_blocks);
-	void Collide(const Rectangle &rec, int level_num); // Colliding with playing bar
-	void PlayHitBarSound() { PlaySound(hit_bar_sound); }
+	void Collide(const Rectangle &rec, int level_num);				   // Colliding with playing bar
+	void Collide(const HUD &hud, const Rectangle &rec, int level_num); // Colliding with playing bar for mobile
+	void PlayHitBarSound()
+	{
+		PlaySound(hit_bar_sound);
+	}
 	void PlayHitBlockSound() { PlaySound(hit_block_sound); }
 
 	Circle Scale(Circle &&shape) override;

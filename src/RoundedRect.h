@@ -31,7 +31,7 @@ private:
 	float roundness = 0.2f;
 	float segments = 0.0f;
 
-	static Vector2 position(const Rectangle &rec, float pos_y)
+	constexpr static Vector2 position(const Rectangle &rec, float pos_y)
 	{
 		return (Vector2){WindowManager::window_size().width / 2 - rec.width / 2, pos_y};
 	}

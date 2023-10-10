@@ -47,7 +47,7 @@ private:
     ButtonState state = kNormal;
     bool activated = false;
 
-    static float frame_height(const Texture2D &button)
+    constexpr static float frame_height(const Texture2D &button)
     {
         return (float)button.height / kNumberOfFrames;
     }
@@ -57,7 +57,7 @@ private:
         return (Rectangle){WindowManager::window_size().width / 2 + pos_x * WindowManager::scale().x, WindowManager::window_size().height / 2 - height / 2, width, height};
     }
 
-    static Rectangle rectangle(float width, float height, const Vector2 &position)
+    constexpr static Rectangle rectangle(float width, float height, const Vector2 &position)
     {
         return (Rectangle){position.x, position.y, width, height};
     }

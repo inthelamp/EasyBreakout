@@ -69,12 +69,13 @@ public:
 		height = height > kWindowMaxHeight ? kWindowMaxHeight : height;
 		return (Size){width, height};
 	}
-	static const Vector2 scale() { return (Vector2){kWindowWidth / 960.0f, kWindowHeight / 540.0f}; }
+	constexpr static Vector2 scale() { return (Vector2){kWindowWidth / 960.0f, kWindowHeight / 540.0f}; }
 #else
 	static const Vector2 scale() { return kScale; }
 #endif
-	static const Size window_size() { return (Size){kWindowWidth, kWindowHeight}; }
-	static const bool IsMobile() { return kWindowWidth < 640 ? true : false; }
+	constexpr static Size window_size() { return (Size){kWindowWidth, kWindowHeight}; }
+	constexpr static bool IsMobile() { return kWindowWidth <= 800 ? true : false; }
+	// static const bool IsMobile() { return true; }
 	static void DisplayText(const DisplayArea &display_area, const char *text, int pos_x, int pos_y, int font_size, const Color &color);
 
 private:

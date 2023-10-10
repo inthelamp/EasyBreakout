@@ -58,7 +58,8 @@ int main(void)
     const Sound button_sound = LoadSound(button_sound_file_name);
     const Sound hit_bar_sound = LoadSound(hit_bar_sound_file_name);     // Load hitting bar audio file
     const Sound hit_block_sound = LoadSound(hit_block_sound_file_name); // Load hitting block audio file
-    SetSoundVolume(hit_bar_sound, 0.5f);
+    SetMasterVolume(0.1f);
+    // SetSoundVolume(hit_bar_sound, 0.1f);
     // Music background_sound = LoadMusicStream("./resources/audio/background.wav");  // Load background sound audio file
     // background_sound.looping = true;
     // SetMusicVolume(background_sound, BACKGROUND_SOUND_VOLUMN);
@@ -193,15 +194,22 @@ void UpdateDrawFrame()
         if (IsKeyDown(KEY_ESCAPE))
             player->set_state(kIntro);
 
+        bool has_gesture = false; // For mobile device
+
         // Moving playing bat
         if (WindowManager::IsMobile())
         {
             hud->set_last_gesture(hud->current_gesture());
             hud->set_current_gesture(GetGestureDetected());
-            if (hud->current_gesture() != hud->last_gesture() && (hud->current_gesture() == GESTURE_TAP || hud->current_gesture() == GESTURE_HOLD))
+            if (hud->current_gesture() != hud->last_gesture() && (hud->current_gesture() == GESTURE_TAP || hud->current_gesture() == GESTURE_HOLD || hud->current_gesture() == GESTURE_DOUBLETAP || hud->current_gesture() == GESTURE_DRAG))
             {
-                playingBar->Move(*hud);
+                has_gesture = true;
             }
+        }
+
+        if (WindowManager::IsMobile() && has_gesture)
+        {
+            playingBar->Move(*hud);
         }
         else
         {
@@ -240,7 +248,16 @@ void UpdateDrawFrame()
         if (ball->IsCollided(play_bar_shape) && !ball->is_held())
         {
             ball->PlayHitBarSound();
-            ball->Collide(play_bar_shape, level->get_level_num());
+
+            // Hit back in the same direction
+            if (WindowManager::IsMobile() && has_gesture)
+            {
+                ball->Collide(*hud, play_bar_shape, level->get_level_num());
+            }
+            else
+            {
+                ball->Collide(play_bar_shape, level->get_level_num());
+            }
         }
 
         // When the ball hits blocks

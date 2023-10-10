@@ -4,6 +4,7 @@
  *  Created on: Sep. 26, 2023
  *      Author: Dong Won Kim
  */
+
 #include "Button.h"
 
 Button::Button(const Texture2D &button, float pos_x) : GraphicsEntity<Rectangle>(rectangle((float)button.width, frame_height(button), pos_x), position(frame_height(button), pos_x)), button(button), source_rectangle((Rectangle){0, 0, (float)button.width, frame_height(button)})

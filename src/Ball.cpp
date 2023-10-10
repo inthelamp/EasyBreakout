@@ -106,11 +106,28 @@ void Ball::Collide(const Rectangle &rec, const Vector2 &speed)
 }
 
 // Colliding with playing bar
+void Ball::Collide(const HUD &hud, const Rectangle &rec, int level_num)
+{
+	const auto speed = get_speed();
+
+	if (!held && hud.IsControlPointTouched(hud.hit_back_control())) // Hit back in the same direction
+	{
+		Collide(rec, (Vector2){speed.x * -1.0f, speed.y});
+	}
+	else
+	{
+		Collide(rec, (Vector2){RandomSpeedX(speed, level_num), speed.y});
+	}
+
+	enabled = true; // It is enabled again when it hits playing bar
+	risk_rate = 0;
+}
+
 void Ball::Collide(const Rectangle &rec, int level_num)
 {
 	const auto speed = get_speed();
 
-	if (!held && IsKeyDown(KEY_SPACE))
+	if (!held && IsKeyDown(KEY_SPACE)) // Hit back in the same direction
 	{
 		Collide(rec, (Vector2){speed.x * -1.0f, speed.y});
 	}
