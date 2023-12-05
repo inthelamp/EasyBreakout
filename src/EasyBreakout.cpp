@@ -89,25 +89,40 @@ int main(void)
 
     // Loading game objects
     //----------------------------------------------------------------------------------
+    int has_incomplete_tutorial = 0;
     if (FileExists(StorageValue::storage_data_file()))
     {
         const int level_num = StorageValue::LoadStorageValue(kStoragePositionLevel);
         const int num_of_blocks = StorageValue::LoadStorageValue(kStoragePositionNumOfBlock);
         const unsigned int score = StorageValue::LoadStorageValue(kStoragePositionScore);
         const unsigned int high_score = StorageValue::LoadStorageValue(kStoragePositionHighScore);
+        has_incomplete_tutorial = StorageValue::LoadStorageValue(kStoragePositionTutorial);
 
         level = new Level(level_num, num_of_blocks, RAYWHITE);
-        player = new Player(level);
+        player = new Player(*level);
         player->set_score(score);
         player->set_high_score(high_score);
     }
     else
     {
         level = new Level(1, 7, RAYWHITE);
-        player = new Player(level);
+        player = new Player(*level);
     }
     playingBar = new PlayingBar(MAROON);
     ball = new Ball(hit_bar_sound, hit_block_sound, MAROON, playingBar->get_position().y, level->get_ball_speed());
+
+    // Setting up tutorials for player
+    if (level->get_level_num() == 1 || has_incomplete_tutorial)
+    {
+        if (WindowManager::IsMobile())
+        {
+            player->set_tutorials(std::shared_ptr<TutorialCondition>(hud->left_control()), std::shared_ptr<TutorialCondition>(hud->right_control()), std::shared_ptr<TutorialCondition>(playingBar), std::shared_ptr<TutorialCondition>(hud->hit_back_control()));
+        }
+        else
+        {
+            player->set_tutorials(std::shared_ptr<TutorialCondition>(ball));
+        }
+    }
 
 #if defined(EMSCRIPTEN)
     emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
@@ -167,7 +182,7 @@ void UpdateDrawFrame()
     //----------------------------------------------------------------------------------
     // UpdateMusicStream(background_sound);      // Update music buffer with new stream data
 
-    if (player->get_state() == kIntro)
+    if (player->state() == kIntro)
     {
         play_button->set_state(kNormal);
         play_button->set_activated(false);
@@ -189,7 +204,7 @@ void UpdateDrawFrame()
             WaitTime(0.2); // Wait 0.2 seconds
         }
     }
-    else if (player->get_state() == kPlay)
+    else if (player->state() == kPlay)
     {
         if (IsKeyDown(KEY_ESCAPE))
             player->set_state(kIntro);
@@ -207,9 +222,53 @@ void UpdateDrawFrame()
             }
         }
 
+        // Dealing with tutorials
+        auto tutorials = player->tutorials().get();
+        int index = player->current_tutorial_idx();
+        if (!tutorials->empty() && index < tutorials->size())
+        {
+            Tutorial &tutorial = tutorials->at(index); // For updating tutorial properties
+            auto tutorial_condition = tutorial.tutorial_condition();
+
+            if (!tutorial.started())
+            {
+                tutorial.set_started(true); // Start simple tutorial
+                if (tutorial_condition)
+                {
+                    tutorial_condition->set_condition_started(true); // Start complex tutorial with condition to complete
+                }
+            }
+            else
+            {
+                if (!tutorial_condition)
+                {
+                    bool triggered{false};
+                    if (WindowManager::IsMobile() && has_gesture)
+                    {
+                        triggered = IsMouseButtonPressed(tutorial.input_method().mouse_button);
+                    }
+                    else
+                    {
+                        triggered = IsKeyDown(tutorial.input_method().keyboard_key);
+                    }
+
+                    if (!tutorial.completed() && triggered)
+                    {
+                        tutorial.set_completed(true); // Finish simple tutorial
+                        player->set_current_tutorial_idx(++index);
+                    }
+                }
+                else if (tutorial_condition->condition_achieved())
+                {
+                    tutorial.set_completed(true); // Finish complex tutorial with condition
+                    player->set_current_tutorial_idx(++index);
+                }
+            }
+        }
+
         if (WindowManager::IsMobile() && has_gesture)
         {
-            playingBar->Move(*hud);
+            playingBar->Move(hud);
         }
         else
         {
@@ -221,7 +280,15 @@ void UpdateDrawFrame()
         {
             if (ball->is_held() && playingBar->IsPlayingBarTouched())
             {
-                ball->set_held(false);
+                if (playingBar->condition_achieved())
+                {
+                    ball->set_held(false);
+                }
+                else if (playingBar->condition_started()) // Tutorial condition is met
+                {
+                    playingBar->set_condition_achieved(true);
+                    ball->set_held(false);
+                }
             }
         }
         else
@@ -252,7 +319,7 @@ void UpdateDrawFrame()
             // Hit back in the same direction
             if (WindowManager::IsMobile() && has_gesture)
             {
-                ball->Collide(*hud, play_bar_shape, level->get_level_num());
+                ball->Collide(hud, play_bar_shape, level->get_level_num());
             }
             else
             {
@@ -288,7 +355,7 @@ void UpdateDrawFrame()
                 player->set_state(kEnd); // Player ends the game after finishing all levels
         }
     }
-    else if (player->get_state() == kOut)
+    else if (player->state() == kOut)
     { // Failed, try the same level again
         ball->set_held(true);
 
@@ -302,7 +369,7 @@ void UpdateDrawFrame()
         level = new Level(level_num, num_of_blocks, RAYWHITE);
 
         // Initialize game objects
-        player->set_level(level);
+        player->set_level(*level);
 
         // Load score from storage
         const unsigned int score = StorageValue::LoadStorageValue(kStoragePositionScore);
@@ -320,7 +387,7 @@ void UpdateDrawFrame()
 
         player->set_state(kPlay);
     }
-    else if (player->get_state() == kLevelUp)
+    else if (player->state() == kLevelUp)
     {
         ball->set_held(true);
 
@@ -328,15 +395,17 @@ void UpdateDrawFrame()
         int level_num = level->get_level_num();
         StorageValue::SaveStorageValue(kStoragePositionLevel, level_num);
 
-        const unsigned int score = player->get_score();
+        const unsigned int score = player->score();
         StorageValue::SaveStorageValue(kStoragePositionScore, score);
 
-        const unsigned int high_score = player->get_high_score();
+        const unsigned int high_score = player->high_score();
         if (score > high_score)
         {
             player->set_high_score(score);
             StorageValue::SaveStorageValue(kStoragePositionHighScore, score);
         }
+
+        StorageValue::SaveStorageValue(kStoragePositionTutorial, player->TutorialsCompleted() ? 0 : 1); // If tutorial to complete exists, then 1. Otherwise, it is 0
 
         const int num_of_blocks = level->get_number_of_blocks();
 
@@ -347,7 +416,7 @@ void UpdateDrawFrame()
         level = new Level(++level_num, num_of_blocks + 5, RAYWHITE);
 
         // Initialize game objects
-        player->set_level(level);
+        player->set_level(*level);
         playingBar->set_default_position();
         playingBar->set_speed(level->get_level_num()); // Increase playing bar speed
 
@@ -361,16 +430,17 @@ void UpdateDrawFrame()
 
         player->set_state(kPlay);
     }
-    else if (player->get_state() == kEnd)
+    else if (player->state() == kEnd)
     {
         // Save player's data
         StorageValue::SaveStorageValue(kStoragePositionLevel, level->get_level_num());
         StorageValue::SaveStorageValue(kStoragePositionNumOfBlock, level->get_number_of_blocks());
-        StorageValue::SaveStorageValue(kStoragePositionHighScore, player->get_high_score());
+        StorageValue::SaveStorageValue(kStoragePositionHighScore, player->high_score());
+        StorageValue::SaveStorageValue(kStoragePositionTutorial, player->TutorialsCompleted() ? 0 : 1); // If tutorial to complete exists, then 1. Otherwise, it is 0
 
         player->set_state(kGoodbye);
     }
-    else if (player->get_state() == kGoodbye)
+    else if (player->state() == kGoodbye)
     {
         exit_window = WindowShouldClose(); // Detect window close button or ESC key
     }
@@ -381,7 +451,7 @@ void UpdateDrawFrame()
     BeginDrawing();
 
     // Introduction of game
-    if (player->get_state() == kIntro)
+    if (player->state() == kIntro)
     {
         ClearBackground(kBackgroundColor);
 
@@ -389,7 +459,7 @@ void UpdateDrawFrame()
         play_button->Draw();
         end_button->Draw();
     }
-    else if (player->get_state() == kPlay)
+    else if (player->state() == kPlay)
     { // Playing game
         ClearBackground(level->get_background_color());
 
@@ -421,8 +491,20 @@ void UpdateDrawFrame()
         // WindowManager::DisplayText(kMiddle, window_scale.c_str(), -50, 10, 20, DARKGRAY);
 
         // Presenting player's score
-        const std::string player_score = "Score : " + std::to_string(player->get_score());
+        const std::string player_score = "Score : " + std::to_string(player->score());
         WindowManager::DisplayText(kRight, player_score.c_str(), -140, 10, 20, DARKGRAY);
+
+        // Presenting tutorial instructions
+        auto tutorials = player->tutorials();
+        int index = player->current_tutorial_idx();
+        if (!tutorials->empty() && index < tutorials->size())
+        {
+            Tutorial &tutorial = tutorials->at(index);
+            if (tutorial.started() && !tutorial.completed())
+            {
+                WindowManager::DisplayText(kBottomLeft, tutorial.instruction().c_str(), 50, -100, 20, RED);
+            }
+        }
 
         if (WindowManager::IsMobile())
         {
@@ -439,26 +521,26 @@ void UpdateDrawFrame()
             }
         }
     }
-    else if (player->get_state() == kOut)
+    else if (player->state() == kOut)
     {
         ClearBackground(kBackgroundColor);
 
         WindowManager::DisplayText(kCentre, "Try again!", -100, -100, 40, RED);
     }
-    else if (player->get_state() == kLevelUp)
+    else if (player->state() == kLevelUp)
     {
         ClearBackground(kBackgroundColor);
 
         WindowManager::DisplayText(kCentre, "Level up!", -100, -100, 40, BLACK);
     }
-    else if (player->get_state() == kGoodbye)
+    else if (player->state() == kGoodbye)
     {
         ClearBackground(kBackgroundColor);
 
         WindowManager::DisplayText(kCentre, "Goodbye!", -100, -100, 40, GRAY);
 
         // Presenting player's high score
-        const std::string player_high_score = "High score : " + std::to_string(player->get_high_score());
+        const std::string player_high_score = "High score : " + std::to_string(player->high_score());
         WindowManager::DisplayText(kCentre, player_high_score.c_str(), -160, -10, 40, GRAY);
     }
 

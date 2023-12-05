@@ -11,9 +11,10 @@
 #include "raylib.h"
 
 #include "GraphicsEntity.h"
+#include "TutorialCondition.h"
 #include "Circle.h"
 
-class ControlPoint : public GraphicsEntity<Circle>
+class ControlPoint : public TutorialCondition, public GraphicsEntity<Circle>
 {
 public:
     constexpr static float kDefaultRadius = 34.0f; // Control point radius

@@ -13,9 +13,10 @@
 #include "WindowManager.h"
 #include "MovingEntity.h"
 #include "RoundedRect.h"
+#include "TutorialCondition.h"
 #include "HUD.h"
 
-class PlayingBar final : public MovingEntity, public RoundedRect
+class PlayingBar final : public TutorialCondition, public MovingEntity, public RoundedRect
 {
 public:
 	PlayingBar(const Color &color);
@@ -25,7 +26,7 @@ public:
 
 	bool IsPlayingBarTouched();
 	void Move() override;
-	void Move(const HUD &hud); // For mobile
+	void Move(HUD *hud); // For mobile
 	void Draw() override;
 
 private:

@@ -20,7 +20,6 @@ class RoundedRect : public GraphicsEntity<Rectangle>
 public:
 	RoundedRect(const Rectangle &rec, float pos_y, float roundness, float segments);
 	RoundedRect(const Rectangle &rec, float roundness, float segments);
-	virtual ~RoundedRect(){};
 
 	float get_roundness() { return roundness; }
 	float get_segments() { return segments; }

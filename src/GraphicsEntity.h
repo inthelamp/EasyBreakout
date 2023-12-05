@@ -5,8 +5,8 @@
  *      Author: Dong Won Kim
  */
 
-#ifndef GRAPHICSENTITY_H_
-#define GRAPHICSENTITY_H_
+#ifndef GRAPHICS_ENTITY_H_
+#define GRAPHICS_ENTITY_H_
 
 #include <utility>
 #include <typeinfo>
@@ -43,4 +43,4 @@ private:
 	Vector2 position;
 };
 
-#endif // GRAPHICSENTITY_H_
+#endif // GRAPHICS_ENTITY_H_

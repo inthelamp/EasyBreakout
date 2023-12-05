@@ -19,6 +19,8 @@
 #include "HUD.h"
 #include "Circle.h"
 #include "Block.h"
+#include "Tutorial.h"
+#include "TutorialCondition.h"
 
 // Initial ball speed on x-axis
 inline float ball_inital_speed_x() { return 2.0f * WindowManager::scale().x; }
@@ -31,7 +33,7 @@ inline float random_speed_rate_x()
 	return GetRandomValue(5 * WindowManager::scale().x, 27 * WindowManager::scale().x) / 10.0f * WindowManager::scale().x;
 }
 
-class Ball final : public MovingEntity, public GraphicsEntity<Circle>
+class Ball final : public TutorialCondition, public MovingEntity, public GraphicsEntity<Circle>
 {
 public:
 	Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, float pos_y, const Vector2 &speed);
@@ -51,8 +53,8 @@ public:
 
 	// Checking collision with blocks and returning the block number hit, otherwise returning -1
 	int CollidedBlock(Block *blocks, int number_of_blocks);
-	void Collide(const Rectangle &rec, int level_num);				   // Colliding with playing bar
-	void Collide(const HUD &hud, const Rectangle &rec, int level_num); // Colliding with playing bar for mobile
+	void Collide(const Rectangle &rec, int level_num);			 // Colliding with playing bar
+	void Collide(HUD *hud, const Rectangle &rec, int level_num); // Colliding with playing bar for mobile
 	void PlayHitBarSound()
 	{
 		PlaySound(hit_bar_sound);

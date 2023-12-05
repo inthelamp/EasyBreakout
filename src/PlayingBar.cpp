@@ -38,18 +38,30 @@ void PlayingBar::Move()
 	}
 }
 
-void PlayingBar::Move(const HUD &hud)
+void PlayingBar::Move(HUD *hud)
 {
 	auto pos_x = get_position_x();
 
-	if (hud.IsControlPointTouched(hud.left_control()) && pos_x > 0.0f)
+	auto lcp = hud->left_control();
+	if (hud->IsControlPointTouched(lcp) && pos_x > 0.0f)
 	{
+		// Tutorial condition is met
+		if (lcp->condition_started())
+		{
+			lcp->set_condition_achieved(true);
+		}
 		pos_x -= get_speed_x();
 		set_position_x(pos_x);
 	}
 
-	if (hud.IsControlPointTouched(hud.right_control()) && pos_x < (WindowManager::window_size().width - kPlayingBarSize.width * WindowManager::scale().x))
+	auto rcp = hud->right_control();
+	if (hud->IsControlPointTouched(rcp) && pos_x < (WindowManager::window_size().width - kPlayingBarSize.width * WindowManager::scale().x))
 	{
+		// Tutorial condition is met
+		if (rcp->condition_started())
+		{
+			rcp->set_condition_achieved(true);
+		}
 		pos_x += get_speed_x();
 		set_position_x(pos_x);
 	}

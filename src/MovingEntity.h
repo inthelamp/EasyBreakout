@@ -5,8 +5,8 @@
  *      Author: Dong Won Kim
  */
 
-#ifndef MOVING_OBJECT_
-#define MOVING_OBJECT_
+#ifndef MOVING_ENTITY_
+#define MOVING_ENTITY_
 
 #include <utility>
 
@@ -34,4 +34,4 @@ private:
 	Vector2 speed;
 };
 
-#endif // MOVING_OBJECT_
+#endif // MOVING_ENTITY_

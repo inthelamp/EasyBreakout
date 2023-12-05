@@ -44,7 +44,6 @@ class Block : public MovingEntity, public RoundedRect
 public:
 	Block();
 	Block(const Color &color, int points, const Vector2 &position);
-	virtual ~Block() {}
 
 	const static float block_width() { return kBlockSize.width * WindowManager::scale().x; }
 	const static float block_height() { return kBlockSize.height * WindowManager::scale().y; }

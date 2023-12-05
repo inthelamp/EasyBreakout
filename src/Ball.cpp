@@ -106,12 +106,18 @@ void Ball::Collide(const Rectangle &rec, const Vector2 &speed)
 }
 
 // Colliding with playing bar
-void Ball::Collide(const HUD &hud, const Rectangle &rec, int level_num)
+void Ball::Collide(HUD *hud, const Rectangle &rec, int level_num)
 {
 	const auto speed = get_speed();
 
-	if (!held && hud.IsControlPointTouched(hud.hit_back_control())) // Hit back in the same direction
+	auto hbcp = hud->hit_back_control();
+	if (!held && hud->IsControlPointTouched(hbcp)) // Hit back in the same direction
 	{
+		// Tutorial condition is met
+		if (hbcp->condition_started())
+		{
+			hbcp->set_condition_achieved(true);
+		}
 		Collide(rec, (Vector2){speed.x * -1.0f, speed.y});
 	}
 	else
@@ -127,8 +133,13 @@ void Ball::Collide(const Rectangle &rec, int level_num)
 {
 	const auto speed = get_speed();
 
-	if (!held && IsKeyDown(KEY_SPACE)) // Hit back in the same direction
+	if (!held && IsKeyDown(KEY_TAB)) // Hit back in the same direction
 	{
+		// Tutorial condition is met
+		if (condition_started())
+		{
+			set_condition_achieved(true);
+		}
 		Collide(rec, (Vector2){speed.x * -1.0f, speed.y});
 	}
 	else

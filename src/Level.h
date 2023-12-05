@@ -26,7 +26,7 @@ public:
 
     Level(int level_num, int number_of_blocks, const Color &background_color);
     Level(int level_num, int number_of_blocks, const Vector2 &ball_speed, const Color &background_color);
-    virtual ~Level()
+    ~Level()
     {
         delete[] blocks;
     }

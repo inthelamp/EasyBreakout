@@ -18,7 +18,8 @@ enum StorageData
     kStoragePositionLevel = 0,
     kStoragePositionNumOfBlock = 1,
     kStoragePositionScore = 2,
-    kStoragePositionHighScore = 3
+    kStoragePositionHighScore = 3,
+    kStoragePositionTutorial = 4 // If tutorial to complete exists, then 1. Otherwise, it is 0
 };
 
 // Static class

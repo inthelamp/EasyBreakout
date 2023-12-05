@@ -26,7 +26,6 @@ public:
     Button(const Texture2D &button, float pos_x);
     Button(const Texture2D &button, const Sound *const sound, float pos_x);
     Button(const Texture2D &button, const Sound *const sound, const Rectangle &source_rec, const Vector2 &position);
-    virtual ~Button() {}
 
     ButtonState get_state() { return state; }
     void set_state(ButtonState state) { this->state = state; }
