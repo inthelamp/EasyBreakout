@@ -12,13 +12,13 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Set the project name
-project (EasyBreakout VERSION 0.1.1)
+project (EasyBreakout VERSION 0.3.3)
 
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Dependencies
-set(RAYLIB_VERSION 4.5.0)
+set(RAYLIB_VERSION 5.0)
 find_package(raylib ${RAYLIB_VERSION} QUIET)
 if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   include(FetchContent)
@@ -37,7 +37,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 # EasyBreakout project
-file(GLOB "${PROJECT_NAME}_SOURCES" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB "${PROJECT_NAME}_SOURCES" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc")
 
 set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
