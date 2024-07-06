@@ -113,10 +113,12 @@ void Ball::Collide(HUD *hud, const Rectangle &rec, int level_num)
 	auto hbcp = hud->hit_back_control();
 	if (!held_ && hud->IsControlPointTouched(hbcp)) // Hit back in the same direction
 	{
+		auto tutorial_condition = hbcp->tutorial_condition;
+
 		// Tutorial condition is met
-		if (hbcp->condition_started())
+		if (tutorial_condition->started())
 		{
-			hbcp->condition_achieved(true);
+			tutorial_condition->achieved(true);
 		}
 		Collide(rec, {speed.x * -1.0f, speed.y});
 	}
@@ -136,9 +138,9 @@ void Ball::Collide(const Rectangle &rec, int level_num)
 	if (!held_ && IsKeyDown(KEY_TAB)) // Hit back in the same direction
 	{
 		// Tutorial condition is met
-		if (condition_started())
+		if (tutorial_condition->started())
 		{
-			condition_achieved(true);
+			tutorial_condition->achieved(true);
 		}
 		Collide(rec, {speed.x * -1.0f, speed.y});
 	}

@@ -11,10 +11,10 @@
 #include "raylib.h"
 
 #include "graphics_entity.h"
-#include "tutorial_condition.h"
 #include "circle.h"
+#include "tutorial_condition.h"
 
-class ControlPoint : public TutorialCondition, public GraphicsEntity<Circle>
+class ControlPoint : public GraphicsEntity<Circle>
 {
 public:
     constexpr static float kDefaultRadius = 34.0f; // Control point radius
@@ -22,6 +22,8 @@ public:
     ControlPoint();
     ControlPoint(const Vector2 &position);
     ControlPoint(const Color &color, float radius, const Vector2 &position);
+
+    std::shared_ptr<TutorialCondition> tutorial_condition = std::make_shared<TutorialCondition>();
 
     void Draw() override;
     Circle Scale(Circle &&shape) override;

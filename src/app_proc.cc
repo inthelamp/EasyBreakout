@@ -84,19 +84,12 @@ void AppProc::Initialize()
         if (Screen::IsMobile())
         {
             // Define tutorial ending condtion
-            TutorialCondition move_to_left_condition = *hud_->left_control();
-            TutorialCondition move_to_right_condition = *hud_->right_control();
-            TutorialCondition start_game_condition = *playing_bar_;
-            TutorialCondition hit_ball_back_condition = *hud_->hit_back_control();
-
-            player_->tutorials(std::make_unique<TutorialCondition>(move_to_left_condition), std::make_unique<TutorialCondition>(move_to_right_condition), std::make_unique<TutorialCondition>(start_game_condition), std::make_unique<TutorialCondition>(hit_ball_back_condition));
+            MakeTutorials(hud_->left_control()->tutorial_condition, hud_->right_control()->tutorial_condition, playing_bar_->tutorial_condition, hud_->hit_back_control()->tutorial_condition);
         }
         else
         {
             // Define tutorial ending condtion
-            TutorialCondition hit_ball_back_condition = *ball_;
-
-            player_->tutorials(std::make_unique<TutorialCondition>(hit_ball_back_condition));
+            MakeTutorials(ball_->tutorial_condition);
         }
     }
 }
@@ -227,24 +220,24 @@ void AppProc::UpdatePlay()
     }
 
     // Dealing with tutorials
-    auto tutorials = player_->tutorials();
+    auto &tutorials = player_->tutorials();
     unsigned long index = player_->current_tutorial_idx();
+
     if (!tutorials.empty() && index < tutorials.size())
     {
-        std::shared_ptr<Tutorial> &tutorial = tutorials.at(index); // For updating tutorial properties
-        auto tutorial_condition = tutorial->tutorial_condition();
+        auto &tutorial = tutorials.at(index); // For updating tutorial properties
 
         if (!tutorial->started())
         {
             tutorial->started(true); // Start simple tutorial
-            if (tutorial_condition)
+            if (tutorial->tutorial_condition.get() != nullptr)
             {
-                tutorial_condition->condition_started(true); // Start complex tutorial with condition to complete
+                tutorial->tutorial_condition->started(true); // Start complex tutorial with condition to complete
             }
         }
         else
         {
-            if (!tutorial_condition)
+            if (tutorial->tutorial_condition.get() == nullptr)
             {
                 bool triggered{false};
                 if (Screen::IsMobile() && has_gesture)
@@ -256,15 +249,16 @@ void AppProc::UpdatePlay()
                     triggered = IsKeyDown(tutorial->input_method().keyboard_key);
                 }
 
+                // Finish simple tutorial
                 if (!tutorial->completed() && triggered)
                 {
-                    tutorial->completed(true); // Finish simple tutorial
+                    tutorial->completed(true);
                     player_->current_tutorial_idx(++index);
                 }
             }
-            else if (tutorial_condition->condition_achieved())
+            else if (tutorial->tutorial_condition->achieved()) // Finish complex tutorial with condition
             {
-                tutorial->completed(true); // Finish complex tutorial with condition
+                tutorial->completed(true);
                 player_->current_tutorial_idx(++index);
             }
         }
@@ -284,13 +278,14 @@ void AppProc::UpdatePlay()
     {
         if (ball_->held() && playing_bar_->IsPlayingBarTouched())
         {
-            if (playing_bar_->condition_achieved())
+            auto tutorial_condition = playing_bar_->tutorial_condition;
+            if (tutorial_condition->achieved())
             {
                 ball_->held(false);
             }
-            else if (playing_bar_->condition_started()) // Tutorial condition is met
+            else if (tutorial_condition->started()) // Tutorial condition is met
             {
-                playing_bar_->condition_achieved(true);
+                tutorial_condition->achieved(true);
                 ball_->held(false);
             }
         }
@@ -508,7 +503,7 @@ void AppProc::DrawPlay()
     unsigned long index = player_->current_tutorial_idx();
     if (!tutorials.empty() && index < tutorials.size())
     {
-        std::shared_ptr<Tutorial> &tutorial = tutorials.at(index);
+        auto &tutorial = tutorials.at(index);
         if (tutorial->started() && !tutorial->completed())
         {
             Screen::DisplayText(kBottomLeft, tutorial->instruction(), 50, -100, 20, RED);
@@ -557,4 +552,20 @@ void AppProc::DrawGoodbye()
     // Presenting player's high score
     const std::string player_high_score = "High score : " + std::to_string(player_->high_score());
     Screen::DisplayText(kCentre, player_high_score.c_str(), -160, -10, 40, GRAY);
+}
+
+void AppProc::MakeTutorials(std::shared_ptr<TutorialCondition> &hit_ball_back_condition)
+{
+    player_->AddTutorial(std::make_unique<Tutorial>("Press left arrow key to move to left.", KEY_LEFT));
+    player_->AddTutorial(std::make_unique<Tutorial>("Press right arrow key to move to right.", KEY_RIGHT));
+    player_->AddTutorial(std::make_unique<Tutorial>("Press space bar to start the game.", KEY_SPACE));
+    player_->AddTutorial(std::make_unique<Tutorial>(hit_ball_back_condition, "Press tab key when the ball hits the playing bar.", KEY_TAB));
+}
+
+void AppProc::MakeTutorials(std::shared_ptr<TutorialCondition> &move_to_left_condition, std::shared_ptr<TutorialCondition> &move_to_right_condition, std::shared_ptr<TutorialCondition> &start_game_condition, std::shared_ptr<TutorialCondition> &hit_ball_back_condition)
+{
+    player_->AddTutorial(std::make_unique<Tutorial>(move_to_left_condition, "Touch the second circle on the left to move to left.", MOUSE_BUTTON_LEFT));
+    player_->AddTutorial(std::make_unique<Tutorial>(move_to_right_condition, "Touch the circle on the right to move to right.", MOUSE_BUTTON_LEFT));
+    player_->AddTutorial(std::make_unique<Tutorial>(start_game_condition, "Touch the playing bar under the ball to start the game.", MOUSE_BUTTON_LEFT));
+    player_->AddTutorial(std::make_unique<Tutorial>(hit_ball_back_condition, "Touch the first circle on the left when the ball hits the playing bar.", MOUSE_BUTTON_LEFT));
 }

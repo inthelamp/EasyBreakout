@@ -45,19 +45,12 @@ public:
     void current_tutorial_idx(int index) { current_tutorial_idx_ = index; }
 
     // Get tutorials
-    const std::vector<std::shared_ptr<Tutorial>> &tutorials() const { return tutorials_; }
-
-    // Set tutorials
-    void tutorials(std::unique_ptr<TutorialCondition> hit_ball_back_condition);
-
-    // Set tutorials
-    void tutorials(std::unique_ptr<TutorialCondition> move_to_left_condition, std::unique_ptr<TutorialCondition> move_to_right_condition, std::unique_ptr<TutorialCondition> start_game_condition, std::unique_ptr<TutorialCondition> hit_ball_back_condition);
+    std::vector<std::shared_ptr<Tutorial>> &tutorials() { return tutorials_; }
 
     bool IsCompletedAllTutorials();
-    void AddScore(int score)
-    {
-        score_ += score;
-    }
+
+    void AddTutorial(std::unique_ptr<Tutorial> tutorial);
+    void AddScore(int score);
 
 private:
     Level level_;                 // Game level
@@ -65,7 +58,7 @@ private:
     unsigned int high_score_ = 0; // High game score
     PlayerState state_ = kIntro;  // Player status
     int current_tutorial_idx_ = 0;
-    std::vector<std::shared_ptr<Tutorial>> tutorials_; // A list of tutorials
+    std::vector<std::shared_ptr<Tutorial>> tutorials_{}; // A list of tutorials
 };
 
 #endif // PLAYER_H_

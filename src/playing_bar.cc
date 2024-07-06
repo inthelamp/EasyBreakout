@@ -45,10 +45,11 @@ void PlayingBar::Move(HUD *hud)
 	auto lcp = hud->left_control();
 	if (hud->IsControlPointTouched(lcp) && pos_x > 0.0f)
 	{
+		auto tutorial_condition = lcp->tutorial_condition;
 		// Tutorial condition is met
-		if (lcp->condition_started())
+		if (tutorial_condition->started())
 		{
-			lcp->condition_achieved(true);
+			tutorial_condition->achieved(true);
 		}
 		pos_x -= speed_x();
 		position_x(pos_x);
@@ -57,10 +58,11 @@ void PlayingBar::Move(HUD *hud)
 	auto rcp = hud->right_control();
 	if (hud->IsControlPointTouched(rcp) && pos_x < (Screen::window_size().width - kPlayingBarSize.width * Screen::scale().x))
 	{
+		auto tutorial_condition = rcp->tutorial_condition;
 		// Tutorial condition is met
-		if (rcp->condition_started())
+		if (tutorial_condition->started())
 		{
-			rcp->condition_achieved(true);
+			tutorial_condition->achieved(true);
 		}
 		pos_x += speed_x();
 		position_x(pos_x);

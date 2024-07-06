@@ -13,13 +13,15 @@
 #include "screen.h"
 #include "moving_entity.h"
 #include "rounded_rect.h"
-#include "tutorial_condition.h"
 #include "hud.h"
+#include "tutorial_condition.h"
 
-class PlayingBar : public TutorialCondition, public MovingEntity, public RoundedRect
+class PlayingBar : public MovingEntity, public RoundedRect
 {
 public:
 	PlayingBar(const Color &color);
+
+	std::shared_ptr<TutorialCondition> tutorial_condition = std::make_shared<TutorialCondition>();
 
 	void speed(int level_num);
 	void default_position() { GraphicsEntity::position({(float)Screen::window_size().width / 2 - (kPlayingBarSize.width * Screen::scale().x) / 2, Screen::window_size().height - 50 * Screen::scale().y}); }

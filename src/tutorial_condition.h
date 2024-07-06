@@ -8,25 +8,27 @@
 #ifndef TUTORIAL_CONDITION_
 #define TUTORIAL_CONDITION_
 
+#include <memory>
+
 class TutorialCondition
 {
 public:
     TutorialCondition() = default;
-    TutorialCondition(const TutorialCondition &) = default;           // Copy constructor
-    TutorialCondition(TutorialCondition &&) = delete;                 // Move constructor
-    TutorialCondition &operator=(const TutorialCondition &) = delete; // Copy assignment operator
-    TutorialCondition &operator=(TutorialCondition &&) = delete;      // Move assignment operator
-    virtual ~TutorialCondition() = default;
+    TutorialCondition(const TutorialCondition &) = default;      // Copy constructor
+    TutorialCondition(TutorialCondition &&) = delete;            // Move constructor
+    TutorialCondition &operator=(const TutorialCondition &);     // Copy assignment operator
+    TutorialCondition &operator=(TutorialCondition &&) noexcept; // Move assignment operator
+    ~TutorialCondition() = default;
 
-    bool condition_started() { return condition_started_; }
-    void condition_started(bool started) { condition_started_ = started; }
+    bool started() { return started_; }
+    void started(bool started) { started_ = started; }
 
-    bool condition_achieved() { return condition_achieved_; }
-    void condition_achieved(bool achieved) { condition_achieved_ = achieved; }
+    bool achieved() { return achieved_; }
+    void achieved(bool achieved) { achieved_ = achieved; }
 
 private:
-    bool condition_started_ = false;
-    bool condition_achieved_ = false;
+    bool started_ = false;
+    bool achieved_ = false;
 };
 
 #endif // TUTORIAL_CONDITION_

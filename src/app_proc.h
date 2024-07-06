@@ -70,6 +70,7 @@ private:
     Ball *ball_{nullptr};
     Button *play_button_{nullptr};
     Button *end_button_{nullptr};
+
     Vector2 mouse_position_ = {0.0f, 0.0f}; // Coordinate where mouse points to
 
     void UpdateIntroduction();
@@ -83,6 +84,8 @@ private:
     void DrawOut();
     void DrawLevelUp();
     void DrawGoodbye();
+    void MakeTutorials(std::shared_ptr<TutorialCondition> &);
+    void MakeTutorials(std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &);
 };
 
 #endif // APP_PROC_

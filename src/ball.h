@@ -19,7 +19,6 @@
 #include "hud.h"
 #include "circle.h"
 #include "block.h"
-#include "tutorial.h"
 #include "tutorial_condition.h"
 
 // Initial ball speed on x-axis
@@ -33,10 +32,12 @@ inline float random_speed_rate_x()
 	return GetRandomValue(5 * Screen::scale().x, 27 * Screen::scale().x) / 10.0f * Screen::scale().x;
 }
 
-class Ball : public TutorialCondition, public MovingEntity, public GraphicsEntity<Circle>
+class Ball : public MovingEntity, public GraphicsEntity<Circle>
 {
 public:
 	Ball(const Sound &hit_bar_sound, const Sound &hit_block_sound, const Color &color, float pos_y, const Vector2 &speed);
+
+	std::shared_ptr<TutorialCondition> tutorial_condition = std::make_shared<TutorialCondition>();
 
 	const Sound &hit_bar_sound() const { return hit_bar_sound_; }
 	const Sound &hit_block_sound() const { return hit_block_sound_; }
@@ -54,8 +55,9 @@ public:
 
 	bool IsCollided(const Rectangle &rec);						 // Checking collision with rectangle
 	void Collide(const Rectangle &rec, const Vector2 &speed);	 // Colliding with rectangle
-	void Collide(const Rectangle &rec, int level_num);			 // Colliding with playing bar
 	void Collide(HUD *hud, const Rectangle &rec, int level_num); // Colliding with playing bar for mobile
+	void Collide(const Rectangle &rec, int level_num);			 // Colliding with playing bar
+
 	void PlayHitBarSound();
 	void PlayHitBlockSound();
 
