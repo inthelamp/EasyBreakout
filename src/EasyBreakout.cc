@@ -46,6 +46,7 @@ void UpdatePlay();
 void UpdateOut();
 void UpdateLevelUp();
 void UpdateEnd();
+void DrawBorder(int thick, Color color);
 void DrawIntroduction();
 void DrawPlay();
 void DrawOut();
@@ -54,6 +55,7 @@ void DrawGoodbye();
 void MakeTutorials(std::shared_ptr<TutorialCondition> &);
 void MakeTutorials(std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &, std::shared_ptr<TutorialCondition> &);
 #else
+// For Linux and Windows
 #include "app_proc.h"
 #endif
 
@@ -240,6 +242,8 @@ void UpdateDrawFrame()
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
+
+    DrawBorder(3, GRAY);
 
     if (player_->state() == kIntro)
     {
@@ -571,6 +575,14 @@ void UpdateGoodbye()
 {
 }
 
+void DrawBorder(int thick, Color color)
+{
+    DrawRectangle(0, 0, Screen::window_size().width, thick, color);
+    DrawRectangle(0, thick, thick, Screen::window_size().height - (thick * 2), color);
+    DrawRectangle(Screen::window_size().width - thick, thick, thick, Screen::window_size().height - (thick * 2), color);
+    DrawRectangle(0, Screen::window_size().height - thick, Screen::window_size().width, thick, color);
+}
+
 // Draw for introduction stage
 void DrawIntroduction()
 {
@@ -689,4 +701,4 @@ void MakeTutorials(std::shared_ptr<TutorialCondition> &move_to_left_condition, s
     player_->AddTutorial(std::make_unique<Tutorial>(hit_ball_back_condition, "Touch the first circle on the left when the ball hits the playing bar.", MOUSE_BUTTON_LEFT));
 }
 
-#endif
+#endif // For WebAssembly
