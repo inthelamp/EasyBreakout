@@ -7,12 +7,6 @@
 
 #include "hud.h"
 
-bool HUD::IsControlPointTouched(ControlPoint *tp)
-{
-    const Vector2 position = tp->position();
-    return GetTouchX() >= position.x - tp->shape().radius() && GetTouchX() <= position.x + tp->shape().radius() && GetTouchY() >= position.y - tp->shape().radius() && GetTouchY() <= position.y + tp->shape().radius() ? true : false;
-}
-
 void HUD::Draw()
 {
     // Draw control points

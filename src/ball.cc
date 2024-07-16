@@ -105,13 +105,13 @@ void Ball::Collide(const Rectangle &rec, const Vector2 &speed)
 	MovingEntity::speed({speed.x, speed.y * -1.0f});
 }
 
-// Colliding with playing bar
+// Colliding with playing bar contolled by HUD
 void Ball::Collide(HUD *hud, const Rectangle &rec, int level_num)
 {
 	const auto speed = MovingEntity::speed();
 
 	auto hbcp = hud->hit_back_control();
-	if (!held_ && hud->IsControlPointTouched(hbcp)) // Hit back in the same direction
+	if (!held_ && hbcp->IsTouched()) // Hit back in the same direction
 	{
 		auto tutorial_condition = hbcp->tutorial_condition;
 
@@ -131,6 +131,7 @@ void Ball::Collide(HUD *hud, const Rectangle &rec, int level_num)
 	risk_rate_ = 0;
 }
 
+// Colliding with playing bar
 void Ball::Collide(const Rectangle &rec, int level_num)
 {
 	const auto speed = MovingEntity::speed();

@@ -12,6 +12,8 @@ template class GraphicsEntity<Rectangle>;
 
 template <typename T>
 GraphicsEntity<T>::GraphicsEntity(const T &shape, const Vector2 &position) : shape_(shape), position_(position) {}
+template <typename T>
+GraphicsEntity<T>::GraphicsEntity(const T &shape, const Vector2 &position, bool displayed) : shape_(shape), position_(position), displayed_(displayed) {}
 #endif
 
 #if defined(EMSCRIPTEN)
@@ -19,7 +21,13 @@ template <>
 GraphicsEntity<Circle>::GraphicsEntity(const Circle &shape, const Vector2 &position) : shape_(shape), position_(position) {}
 
 template <>
+GraphicsEntity<Circle>::GraphicsEntity(const Circle &shape, const Vector2 &position, bool displayed) : shape_(shape), position_(position), displayed_(displayed) {}
+
+template <>
 GraphicsEntity<Rectangle>::GraphicsEntity(const Rectangle &shape, const Vector2 &position) : shape_(shape), position_(position) {}
+
+template <>
+GraphicsEntity<Rectangle>::GraphicsEntity(const Rectangle &shape, const Vector2 &position, bool displayed) : shape_(shape), position_(position), displayed_(displayed) {}
 #endif
 
 template <>

@@ -193,8 +193,9 @@ void Initialize()
     {
         if (Screen::IsMobile())
         {
+            playing_bar_->InitStartGameCP();
             // Define tutorial ending condtion
-            MakeTutorials(hud_->left_control()->tutorial_condition, hud_->right_control()->tutorial_condition, playing_bar_->tutorial_condition, hud_->hit_back_control()->tutorial_condition);
+            MakeTutorials(hud_->left_control()->tutorial_condition, hud_->right_control()->tutorial_condition, playing_bar_->start_game()->tutorial_condition, hud_->hit_back_control()->tutorial_condition);
         }
         else
         {
@@ -402,7 +403,7 @@ void UpdatePlay()
     {
         if (ball_->held() && playing_bar_->IsPlayingBarTouched())
         {
-            auto tutorial_condition = playing_bar_->tutorial_condition;
+            auto tutorial_condition = playing_bar_->start_game()->tutorial_condition;
             if (tutorial_condition->achieved())
             {
                 ball_->held(false);
@@ -500,9 +501,9 @@ void UpdateOut()
     const unsigned int score = StorageValue::LoadStorageValue(kStoragePositionScore);
     player_->score(score);
 
-    playing_bar_->default_position();
+    playing_bar_->InitPosition();
 
-    ball_->default_position(playing_bar_->GraphicsEntity::position().y);
+    ball_->InitPosition(playing_bar_->GraphicsEntity::position().y);
     ball_->speed(level_->ball_speed());
     ball_->held(true);
     ball_->enabled(true);
@@ -544,10 +545,10 @@ void UpdateLevelUp()
 
     // Initialize game objects
     player_->level(*level_);
-    playing_bar_->default_position();
+    playing_bar_->InitPosition();
     playing_bar_->speed(level_->level_num()); // Increase playing bar speed
 
-    ball_->default_position(playing_bar_->GraphicsEntity::position().y);
+    ball_->InitPosition(playing_bar_->GraphicsEntity::position().y);
     ball_->speed(level_->ball_speed());
     ball_->held(true);
     ball_->enabled(true);

@@ -21,10 +21,21 @@ ControlPoint::ControlPoint(const Vector2 &position) : GraphicsEntity<Circle>(cir
     GraphicsEntity::shape(Scale(std::move(shape)));
 }
 
+ControlPoint::ControlPoint(const Vector2 &position, bool displayed) : GraphicsEntity<Circle>(circle(), position, displayed), color_(kDefaultColor)
+{
+    auto shape = GraphicsEntity::shape();
+    GraphicsEntity::shape(Scale(std::move(shape)));
+}
+
 ControlPoint::ControlPoint(const Color &color, float radius, const Vector2 &position) : GraphicsEntity<Circle>(circle(radius), position), color_(color)
 {
     auto shape = GraphicsEntity::shape();
     GraphicsEntity::shape(Scale(std::move(shape)));
+}
+
+bool ControlPoint::IsTouched()
+{
+    return GetTouchX() >= position_x() - shape().radius() && GetTouchX() <= position_x() + shape().radius() && GetTouchY() >= position_y() - shape().radius() && GetTouchY() <= position_y() + shape().radius() ? true : false;
 }
 
 Circle ControlPoint::Scale(Circle &&circle)
@@ -35,5 +46,8 @@ Circle ControlPoint::Scale(Circle &&circle)
 
 void ControlPoint::Draw()
 {
-    DrawCircleV(GraphicsEntity::position(), shape().radius(), color_);
+    if (displayed())
+    {
+        DrawCircleV(GraphicsEntity::position(), shape().radius(), color_);
+    }
 }

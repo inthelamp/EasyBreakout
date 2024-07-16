@@ -48,7 +48,7 @@ public:
 	int risk_rate() { return risk_rate_; }
 	void risk_rate(int rate) { risk_rate_ = rate; }
 
-	void default_position(float pos_y) { GraphicsEntity::position({(float)Screen::window_size().width / 2, pos_y - shape().radius()}); }
+	void InitPosition(float pos_y) { GraphicsEntity::position({(float)Screen::window_size().width / 2, pos_y - shape().radius()}); }
 
 	// Checking collision with blocks and returning the block number hit, otherwise returning -1
 	int block_collided_with(Block *blocks, int number_of_blocks);

@@ -9,10 +9,14 @@
 
 PlayingBar::PlayingBar(const Color &color) : MovingEntity({kPlayingBarSpeedOnX, 0.0f}), RoundedRect(rectangle(), kPlayingBarRoundness, kPlayingBarSegments), color_(color) {}
 
-void PlayingBar::speed(int level_num)
+void PlayingBar::InitStartGameCP()
 {
-	const float speed_on_x = (float)kPlayingBarSpeedOnX + level_num * kSpeedIncrementRate * 2;
-	MovingEntity::speed({speed_on_x, 0.0f});
+	start_game_ = new ControlPoint(Vector2{(float)Screen::window_size().width / 2, (float)Screen::window_size().height - 50 + kPlayingBarSize.height / 2}, false);
+}
+
+void PlayingBar::InitPosition()
+{
+	GraphicsEntity::position({(float)Screen::window_size().width / 2 - (kPlayingBarSize.width * Screen::scale().x) / 2, Screen::window_size().height - 50 * Screen::scale().y});
 }
 
 bool PlayingBar::IsPlayingBarTouched()
@@ -43,7 +47,7 @@ void PlayingBar::Move(HUD *hud)
 	auto pos_x = position_x();
 
 	auto lcp = hud->left_control();
-	if (hud->IsControlPointTouched(lcp) && pos_x > 0.0f)
+	if (lcp->IsTouched() && pos_x > 0.0f)
 	{
 		auto tutorial_condition = lcp->tutorial_condition;
 		// Tutorial condition is met
@@ -56,7 +60,7 @@ void PlayingBar::Move(HUD *hud)
 	}
 
 	auto rcp = hud->right_control();
-	if (hud->IsControlPointTouched(rcp) && pos_x < (Screen::window_size().width - kPlayingBarSize.width * Screen::scale().x))
+	if (rcp->IsTouched() && pos_x < (Screen::window_size().width - kPlayingBarSize.width * Screen::scale().x))
 	{
 		auto tutorial_condition = rcp->tutorial_condition;
 		// Tutorial condition is met
@@ -66,6 +70,12 @@ void PlayingBar::Move(HUD *hud)
 		}
 		pos_x += speed_x();
 		position_x(pos_x);
+	}
+
+	if (!start_game_->tutorial_condition->achieved())
+	{
+		start_game_->position(Vector2{
+			position_x() + kPlayingBarSize.width / 2, (float)Screen::window_size().height - 50 + kPlayingBarSize.height / 2});
 	}
 }
 

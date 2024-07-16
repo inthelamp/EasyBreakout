@@ -53,7 +53,6 @@ public:
 	ControlPoint *right_control() { return right_control_; }
 	ControlPoint *hit_back_control() { return hit_back_control_; }
 
-	bool IsControlPointTouched(ControlPoint *tp);
 	void Draw();
 
 private:

@@ -17,14 +17,16 @@
 class ControlPoint : public GraphicsEntity<Circle>
 {
 public:
-    constexpr static float kDefaultRadius = 34.0f; // Control point radius
+    constexpr static float kDefaultRadius = 45.0f; // Control point radius
 
     ControlPoint();
     ControlPoint(const Vector2 &position);
+    ControlPoint(const Vector2 &position, bool displayed);
     ControlPoint(const Color &color, float radius, const Vector2 &position);
 
     std::shared_ptr<TutorialCondition> tutorial_condition = std::make_shared<TutorialCondition>();
 
+    bool IsTouched();
     void Draw() override;
     Circle Scale(Circle &&shape) override;
 

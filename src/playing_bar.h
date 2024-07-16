@@ -20,12 +20,28 @@ class PlayingBar : public MovingEntity, public RoundedRect
 {
 public:
 	PlayingBar(const Color &color);
+	PlayingBar(const PlayingBar &) = delete;			// Copy constructor
+	PlayingBar(PlayingBar &&) = delete;					// Move constructor
+	PlayingBar &operator=(const PlayingBar &) = delete; // Copy assignment operator
+	PlayingBar &operator=(PlayingBar &&) = delete;		// Move assignment operator
+	~PlayingBar()
+	{
+		if (Screen::IsMobile())
+		{
+			delete start_game_;
+		}
+	}
 
-	std::shared_ptr<TutorialCondition> tutorial_condition = std::make_shared<TutorialCondition>();
+	// Overloading of MovingEntity::speed
+	void speed(int level_num)
+	{
+		const float speed_on_x = (float)kPlayingBarSpeedOnX + level_num * kSpeedIncrementRate * 2;
+		MovingEntity::speed({speed_on_x, 0.0f});
+	}
 
-	void speed(int level_num);
-	void default_position() { GraphicsEntity::position({(float)Screen::window_size().width / 2 - (kPlayingBarSize.width * Screen::scale().x) / 2, Screen::window_size().height - 50 * Screen::scale().y}); }
-
+	void InitPosition();
+	void InitStartGameCP();
+	ControlPoint *start_game() { return start_game_; }
 	bool IsPlayingBarTouched();
 	void Move() override;
 	void Move(HUD *hud); // For mobile
@@ -43,6 +59,8 @@ private:
 	}
 
 	Color color_;
+
+	ControlPoint *start_game_{nullptr};
 };
 
 #endif // PLAYINGBAR_H_
